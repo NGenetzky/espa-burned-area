@@ -4,6 +4,7 @@ import os
 import re
 import datetime
 import time
+import logging
 import numpy
 import tempfile
 import zipfile
@@ -24,11 +25,11 @@ def logIt (msg, log_handler):
     """Logs the user-specified message.
     logIt logs the information to the logfile (if valid) or to stdout if the
     logfile is None.
-    
+
     Args:
       msg - message to be printed/logged
       log_handler - log file handler; if None then print to stdout
-    
+
     Returns: nothing
     """
 
@@ -48,35 +49,35 @@ def logIt (msg, log_handler):
 class parallelSceneRegressionWorker(multiprocessing.Process):
     """Runs the boosted regression in parallel for a stack of scenes.
     """
- 
+
     def __init__ (self, work_queue, result_queue, stackObject):
         # base class initialization
         multiprocessing.Process.__init__(self)
- 
+
         # job management stuff
         self.work_queue = work_queue
         self.result_queue = result_queue
         self.stackObject = stackObject
         self.kill_received = False
- 
+
 
     def run(self):
+        logger = logging.getLogger(__name__)
         while not self.kill_received:
             # get a task
             try:
                 xml_file = self.work_queue.get_nowait()
             except Queue.Empty:
                 break
- 
+
             # process the scene
-            msg = 'Processing %s ...' % xml_file
-            logIt (msg, self.stackObject.log_handler)
+            logger.info('Processing {0} ...'.format(xml_file))
             status = self.stackObject.sceneBoostedRegression (xml_file)
             if status != SUCCESS:
-                msg = 'Error running boosted regression on the XML file ' \
-                    '(%s). Processing will terminate.' % xml_file
-                logIt (msg, self.stackObject.log_handler)
- 
+                logger.error('Error running boosted regression on the XML'
+                             ' file ({0}). Processing will terminate.'
+                             .format(xml_file))
+
             # store the result
             self.result_queue.put(status)
 
@@ -114,15 +115,15 @@ class BurnedArea():
               Modified to use the ESPA internal raw binary format
           Updated on 4/10/2014 by Gail Schmidt, USGS/EROS LSRD Project
               Modified to run as a multi-threaded process.
-        
+ 
         Args:
           xml_file - name of XML file to process
-        
+ 
         Returns:
             ERROR - error running the model on the XML file
             SUCCESS - successful processing
         """
-   
+        logger = logging.getLogger(__name__)
         # split the xml file into directory and base name
         dir_name = os.path.dirname(xml_file)
         base_name = os.path.basename(xml_file)
@@ -132,18 +133,16 @@ class BurnedArea():
         # exist then create it.
         config_dir = dir_name + '/config'
         if not os.path.exists(config_dir):
-            msg = 'Config directory does not exist: %s. Creating ...' %  \
-                config_dir
-            logIt (msg, self.log_handler)
+            logger.warn('Config directory does not exist: {0}. Creating ...'
+                        .format(config_dir))
             try:
                 os.makedirs(config_dir, 0755)
             except:
                 # recheck just in case there is another thread that made the
                 # config directory already
                 if not os.path.exists(config_dir):
-                    msg = 'Unable to create config directory: %s. ' %  \
-                        'Exiting ...' % config_dir
-                    logIt (msg, self.log_handler)
+                    logger.error('Unable to create config directory: {0}. '
+                                 .format('Exiting ...' % config_dir))
                     return ERROR
 
         temp_file = tempfile.NamedTemporaryFile(mode='w', prefix='temp',
@@ -163,16 +162,15 @@ class BurnedArea():
             input_base_file=base_file, input_mask_file=mask_file,
             output_dir=self.output_dir, model_file=self.model_file)
         if status != SUCCESS:
-            msg = 'Error creating the configuration file for ' + xml_file
-            logIt (msg, self.log_handler)
+            logger.error('Error creating the configuration file for {0}'
+                         .format(xml_file))
             return ERROR
 
         # run the boosted regression, passing the configuration file
         status = BoostedRegression().runBoostedRegression(  \
             config_file=config_file, logfile=self.logfile)
         if status != SUCCESS:
-            msg = 'Error running boosted regression for ' + xml_file
-            logIt (msg, self.log_handler)
+            logger.error('Error running boosted regression for ' + xml_file)
             return ERROR
 
         # clean up the temporary configuration file
@@ -231,7 +229,7 @@ class BurnedArea():
               the output will be written to stdout
           delete_src - if set to true then the source scenes will be deleted
               after being resampled to the maximum geographic extents
-        
+
         Returns:
             ERROR - error running the burned area applications
             SUCCESS - successful processing
@@ -317,41 +315,32 @@ class BurnedArea():
             if options.num_processors is not None:
                 num_processors = options.num_processors
 
-        # open the log file if it exists; use line buffering for the output
-        self.log_handler = None
-        self.logfile = logfile
-        if logfile is not None:
-            self.log_handler = open (logfile, 'w', buffering=1)
+        logger = logging.getLogger(__name__)
 
         # validate options and arguments
         if not os.path.exists(sr_list_file):
-            msg = 'Input surface reflectance list file does not exist: ' +  \
-                sr_list_file
-            logIt (msg, self.log_handler)
+            logger.error('Input surface reflectance list file does not exist:'
+                         ' {0}'.format(sr_list_file))
             return ERROR
 
         if not os.path.exists(input_dir):
-            msg = 'Input directory does not exist: ' + input_dir
-            logIt (msg, self.log_handler)
+            logger.error('Input directory does not exist: ' + input_dir)
             return ERROR
 
         if not os.path.exists(output_dir):
-            msg = 'Output directory does not exist: %s. Creating ...' % \
-                output_dir
-            logIt (msg, self.log_handler)
+            logger.warn('Output directory does not exist: {0}. Creating ...'
+                        .format(output_dir))
             os.makedirs(output_dir, 0755)
 
         if not os.path.exists(model_dir):
-            msg = 'Model directory does not exist: ' + model_dir
-            logIt (msg, self.log_handler)
+            logger.error('Model directory does not exist: ' + model_dir)
             return ERROR
 
         # save the current working directory for return to upon error or when
         # processing is complete
         mydir = os.getcwd()
-        msg = 'Changing directories for burned area processing: ' +  \
-            output_dir
-        logIt (msg, self.log_handler)
+        logger.info('Changing directories for burned area processing: {0}'
+                    .format(output_dir))
         os.chdir (output_dir)
 
         # start of threshold processing
@@ -362,11 +351,10 @@ class BurnedArea():
         sr_list = text_file.readlines()
         text_file.close()
         num_scenes = len(sr_list)
-        msg = 'Number of scenes in the list: %d' % num_scenes
-        logIt (msg, self.log_handler)
+        logger.info('Number of scenes in the list: {0}'.format(num_scenes))
         if num_scenes == 0:
-            msg = 'error reading the list of scenes in ' + sr_list_file
-            logIt (msg, self.log_handler)
+            logger.error('error reading the list of scenes in {0}'
+                         .format(sr_list_file))
             os.chdir (mydir)
             return ERROR
 
@@ -401,33 +389,29 @@ class BurnedArea():
         # validate starting and ending year
         if start_year is not None:
             if (start_year < 1984):
-                msg = 'start_year cannot begin before 1984: %d' % start_year
-                logIt (msg, self.log_handler)
+                logger.error('start_year cannot begin before 1984: {0}'
+                             .format(start_year))
                 os.chdir (mydir)
                 return ERROR
 
         if end_year is not None:
             if (end_year < 1984):
-                msg = 'end_year cannot begin before 1984: %d' % end_year
-                logIt (msg, self.log_handler)
+                logger.error('end_year cannot begin before 1984: {0}'
+                             .format(end_year))
                 os.chdir (mydir)
                 return ERROR
 
         if (end_year is not None) & (start_year is not None):
             if end_year < start_year:
-                msg = 'end_year (%d) is less than start_year (%d)' %  \
-                    (end_year, start_year)
-                logIt (msg, self.log_handler)
+                logger.error('end_year ({0}) is less than start_year ({1})'
+                             .format(end_year, start_year))
                 os.chdir (mydir)
                 return ERROR
 
         # information about what we are doing
-        msg = 'Processing burned area products for'
-        logIt (msg, self.log_handler)
-        msg = '    path/row: %d, %d' % (path, row)
-        logIt (msg, self.log_handler)
-        msg = '    years: %d - %d' % (start_year, end_year)
-        logIt (msg, self.log_handler)
+        logger.info('Processing burned area products for'
+                    '    path/row: {0}, {1}    years: {2} - {3}'
+                    .format(path, row, start_year, end_year))
 
         # run the seasonal summaries and annual maximums for this stack
         msg = '\nProcessing seasonal summaries and annual maximums ...'
@@ -436,8 +420,8 @@ class BurnedArea():
             logfile=logfile, num_processors=num_processors,
             delete_src=delete_src)
         if status != SUCCESS:
-            msg = 'Error running seasonal summaries and annual maximums'
-            logIt (msg, self.log_handler)
+            logger.error('Error running seasonal summaries and annual'
+                         ' maximums')
             os.chdir (mydir)
             return ERROR
 
@@ -447,13 +431,12 @@ class BurnedArea():
         sr_list = text_file.readlines()
         text_file.close()
         num_scenes = len(sr_list)
-        msg = 'Number of scenes in the list after excluding L1Gs: %d' %  \
-            num_scenes
-        logIt (msg, self.log_handler)
+        logger.info('Number of scenes in the list after excluding L1Gs: {0}'
+                    .format(num_scenes))
         if num_scenes == 0:
-            msg = 'error reading the list of scenes in ' + sr_list_file + \
-                ' or no scenes left after excluding L1G products.'
-            logIt (msg, self.log_handler)
+            logger.error('error reading the list of scenes in {0} or no'
+                         ' scenes left after excluding L1G products.'
+                         .format(sr_list_file))
             os.chdir (mydir)
             return ERROR
 
@@ -462,15 +445,13 @@ class BurnedArea():
         model_base_file = get_model_name(path, row)
         self.model_file = '%s/%s' % (model_dir, model_base_file)
         if not os.path.exists(self.model_file):
-            msg = 'Model file for path/row %d, %d does not exist: %s' %  \
-                (path, row, self.model_file)
-            logIt (msg, self.log_handler)
+            logger.error('Model file for path/row {0}, {1} does not exist:'
+                         ' {2}'.format(path, row, self.model_file))
             return ERROR
 
-       # run the boosted regression algorithm for each scene
-        msg = '\nRunning boosted regression for each scene from %d - %d ...' % \
-            (start_year+1, end_year)
-        logIt (msg, self.log_handler)
+        # run the boosted regression algorithm for each scene
+        logger.info('\nRunning boosted regression for each scene from'
+                    ' {0} - {1} ...'.format(start_year+1, end_year))
 
         # load up the work queue for processing scenes in parallel for boosted
         # regression
@@ -496,24 +477,23 @@ class BurnedArea():
 
         # create a queue to pass to workers to store the processing status
         result_queue = multiprocessing.Queue()
- 
+
         # spawn workers to process each scene in the stack - run the boosted
         # regression model on each scene in the stack
-        msg = 'Spawning %d scenes for boosted regression via %d '  \
-            'processors ....' % (num_boosted_scenes, num_processors)
-        logIt (msg, self.log_handler)
+        logger.info('Spawning {0} scenes for boosted regression via {1} '
+                    'processors ....'.format(num_boosted_scenes,
+                                             num_processors))
         for i in range(num_processors):
             worker = parallelSceneRegressionWorker(work_queue, result_queue,
                 self)
             worker.start()
- 
+
         # collect the boosted regression results off the queue
         for i in range(num_boosted_scenes):
             status = result_queue.get()
             if status != SUCCESS:
-                msg = 'Error in boosted regression for XML file %s.' %  \
-                    sr_list[i]
-                logIt (msg, self.log_handler)
+                logger.info('Error in boosted regression for XML file {0}.'
+                            .format(sr_list[i]))
                 return ERROR
 
         # run the burn threshold algorithm to identify burned areas
@@ -523,8 +503,7 @@ class BurnedArea():
             start_year=start_year+1, end_year=end_year,
             num_processors=num_processors)
         if status != SUCCESS:
-            msg = 'Error running burn thresholds'
-            logIt (msg, self.log_handler)
+            logger.error('Error running burn thresholds')
             os.chdir (mydir)
             return ERROR
 
@@ -534,32 +513,27 @@ class BurnedArea():
             stack_file=stack_file, bp_dir=output_dir, bc_dir=output_dir,
             output_dir=output_dir, start_year=start_year+1, end_year=end_year)
         if status != SUCCESS:
-            msg = 'Error running annual burn summaries'
-            logIt (msg, self.log_handler)
+            logger.error('Error running annual burn summaries')
             os.chdir (mydir)
             return ERROR
 
         # zip the burn area annual summaries
         zip_file = 'burned_area_%03d_%03d.zip' % (path, row)
-        msg = '\nZipping the annual summaries to ' + zip_file
-        logIt (msg, self.log_handler)
+        logger.info('\nZipping the annual summaries to ' + zip_file)
         cmdstr = 'zip %s burned_area_* burn_count_* good_looks_count_* '  \
             'max_burn_prob_*' % zip_file
         os.system(cmdstr)
         if not os.path.exists(zip_file):
-            msg = 'Error creating the zip file of all the annual burn ' \
-                'summaries: ' + zip_file
-            logIt (msg, self.log_handler)
+            logger.info('Error creating the zip file of all the annual burn '
+                        'summaries: ' + zip_file)
             os.chdir (mydir)
             return ERROR
 
         # successful processing
         end_time = time.time()
-        msg = '***Total scene processing time = %f hours' %  \
-            ((end_time - start_time) / 3600.0)
-        logIt (msg, self.log_handler)
-        msg = 'Success running burned area processing'
-        logIt (msg, self.log_handler)
+        logger.info('***Total scene processing time = {0} hours'
+                    .format((end_time - start_time) / 3600.0))
+        logger.info('Success running burned area processing')
         os.chdir (mydir)
         return SUCCESS
 
