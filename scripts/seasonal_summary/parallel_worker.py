@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import multiprocessing, Queue
 import time
-from log_it import *
+import logging
 
 #if temporalBAStack is already imported from a higher level script, then
 #this import is not needed
@@ -23,6 +23,7 @@ class parallelSceneWorker(multiprocessing.Process):
  
 
     def run(self):
+        logger = logging.getLogger(__name__)
         while not self.kill_received:
             # get a task
             try:
@@ -31,14 +32,13 @@ class parallelSceneWorker(multiprocessing.Process):
                 break
  
             # process the scene
-            msg = 'Processing %s ...' % xml_file
-            logIt (msg, self.stackObject.log_handler)
+            logger.info('Processing {0} ...'.format(xml_file))
             status = SUCCESS
             status = self.stackObject.sceneResample (xml_file)
             if status != SUCCESS:
-                msg = 'Error resampling the surface reflectance bands in ' \
-                    'the XML file (%s). Processing will terminate.' % xml_file
-                logIt (msg, self.stackObject.log_handler)
+                logger.error('Error resampling the surface reflectance bands '
+                            'in the XML file ({0}). Processing will terminate'
+                            ..format(xml_file))
  
             # store the result
             self.result_queue.put(status)
@@ -60,6 +60,7 @@ class parallelSummaryWorker(multiprocessing.Process):
  
 
     def run(self):
+        logger = logging.getLogger(__name__)
         while not self.kill_received:
             # get a task
             try:
@@ -70,15 +71,15 @@ class parallelSummaryWorker(multiprocessing.Process):
             # process the scene
             year = int (year_season[0])
             season = year_season[1]
-            msg = 'Processing year %d, season %s ...' % (year, season)
-            logIt (msg, self.stackObject.log_handler)
+            logger.info('Processing year {0}, season {1} ...'
+                        .format(year, season))
             status = SUCCESS
             status = self.stackObject.generateYearSeasonalSummaries (year,
                 season)
             if status != SUCCESS:
-                msg = 'Error processing seasonal summaries for year %d, ' \
-                    'season %s. Processing will terminate.' % (year, season)
-                logIt (msg, self.stackObject.log_handler)
+                logger.error('Error processing seasonal summaries for year'
+                             ' {0}, season {1}. Processing will terminate.'
+                             .format(year, season))
  
             # store the result
             self.result_queue.put(status)
@@ -100,6 +101,7 @@ class parallelMaxWorker(multiprocessing.Process):
  
 
     def run(self):
+        logger = logging.getLogger(__name__)
         while not self.kill_received:
             # get a task
             try:
@@ -108,14 +110,12 @@ class parallelMaxWorker(multiprocessing.Process):
                 break
  
             # process the scene
-            msg = 'Processing year %d ...' % year
-            logIt (msg, self.stackObject.log_handler)
+            logger.info('Processing year {0} ...'.format(year))
             status = SUCCESS
             status = self.stackObject.generateYearMaximums (year)
             if status != SUCCESS:
-                msg = 'Error processing maximums for year %d. Processing '  \
-                    'will terminate.' % year
-                logIt (msg, self.stackObject.log_handler)
+                logger.info('Error processing maximums for year {0}.'
+                            ' Processing will terminate.'.format(year))
  
             # store the result
             self.result_queue.put(status)

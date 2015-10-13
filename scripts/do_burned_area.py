@@ -397,7 +397,7 @@ class BurnedArea():
                     .format(path, row, start_year, end_year))
 
         # run the seasonal summaries and annual maximums for this stack
-        msg = '\nProcessing seasonal summaries and annual maximums ...'
+        logger.info('\nProcessing seasonal summaries and annual maximums ...')
         status = temporalBAStack().processStack(input_dir=input_dir,  \
             exclude_l1g=True, exclude_rmse=True, exclude_cloud_cover=True,  \
             logfile=logfile, num_processors=num_processors,

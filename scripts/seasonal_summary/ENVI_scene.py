@@ -6,8 +6,7 @@ from osgeo import osr
 from osgeo import gdal_array
 from osgeo import gdalconst
 import os
-from log_it import *
-
+import logging
 
 #############################################################################
 # Created on 3/24/2014 by Gail Schmidt, USGS/EROS LSRD Project
@@ -57,19 +56,17 @@ class ENVI_Scene:
             None - error opening or reading the file via GDAL
             Object - successful processing
         """
-
+        logger = logging.getLogger(__name__)
         # make sure the file exists
         if not os.path.exists(fname):
-            msg = 'Input file does not exist: ' + fname
-            logIt (msg, log_handler)
+            logger.error('Input file does not exist: ' + fname)
             return None
 
         # store the filename for this class and open it
         self.filename = fname
         self.dataset = gdal.Open (fname)
         if self.dataset is None:
-            msg = 'GDAL could not open input file: ' + fname
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' + fname)
             return None
 
         # create connections to the band
