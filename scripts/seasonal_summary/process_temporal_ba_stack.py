@@ -204,7 +204,7 @@ class temporalBAStack():
             ERROR - error excluding the L1G files
             SUCCESS - successful processing
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # loop through the HDF files in the input directory
         l1g_dir = self.input_dir + 'exclude_l1g/'
         for f_in in sort(os.listdir(self.input_dir)):
@@ -257,7 +257,7 @@ class temporalBAStack():
             ERROR - error excluding the high RMSE files
             SUCCESS - successful processing
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # loop through the HDF files in the input directory
         rmse_dir = self.input_dir + 'exclude_rmse/'
         for f_in in sort(os.listdir(self.input_dir)):
@@ -367,20 +367,20 @@ class temporalBAStack():
             ERROR - error generating the list files
             SUCCESS - successful processing
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # check to make sure the output location exists, create the directory
         # if needed
         list_dirname = os.path.dirname(list_file)
         if list_dirname != "" and not os.path.exists (list_dirname):
-            msg = 'Creating directory for output file: ' + list_dirname
+            logger.info('Creating directory for output file: ' + list_dirname)
             os.makedirs (list_dirname)
-    
+
         # open the output files
         flist_out = open(list_file, 'w')
         if not flist_out:
-            logger.info('Could not open list_file: ' + flist_out)
+            logger.error('Could not open list_file: ' + flist_out)
             return ERROR
-            
+
         # loop through *.xml files in input_directory and gather info
         for f_in in sort(os.listdir(self.input_dir)):
             if f_in.endswith(".xml") and not f_in.endswith(".aux.xml"):
@@ -420,7 +420,7 @@ class temporalBAStack():
             None - error reading the bounding extents
             return_dict - dictionary of spatial extents
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # check to make sure the input file exists before opening
         if not os.path.exists (bounding_extents_file):
             logger.error('Bounding extents file does not exist: ' +
@@ -475,7 +475,7 @@ class temporalBAStack():
             ERROR - error resampling all the surface reflectance bands
             SUCCESS - successful processing
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # read the spatial extents
         self.spatial_extent = self.stackSpatialExtent (bounding_extents_file)
         if self.spatial_extent is None:
@@ -527,8 +527,8 @@ class temporalBAStack():
 
         # make sure we have scenes to be processed
         if num_scenes == 0:
-            logger.info('Error resampling bands stack file.  No bands were '
-                        'specified in ' + stack_file)
+            logger.error('Error resampling bands stack file.  No bands were '
+                         'specified in ' + stack_file)
             return ERROR
 
         # create a queue to pass to workers to store the processing status
@@ -585,14 +585,14 @@ class temporalBAStack():
                 determining the spectral indices
             SUCCESS - successful processing
         """
-   
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # parse the XML file looking for the surface reflectance bands 1-7
         # and the QA bands.  open each band and store the GDAL band connection.
         startTime0 = time.time()
         xmlAttr = XML_Scene (xml_file)
         if xmlAttr is None:
-            logger.info('Error reading the XML and setting up the bands: ' +
-                        xml_file)
+            logger.error('Error reading the XML and setting up the bands: ' +
+                         xml_file)
             return ERROR
 
         # create a single QA band from the surface reflectance QA bands
@@ -707,7 +707,7 @@ class temporalBAStack():
              3, 4, 5, 7, ndvi, ndmi, nbr, and nbr2.
           3. Good count is the number of 'lloks' with no QA flag set
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # make sure the stack file exists
         if not os.path.exists(stack_file):
             logger.error('Could not open stack file: ' + stack_file)
@@ -742,8 +742,8 @@ class temporalBAStack():
         # and other associated info for the stack of scenes
         enviMask = ENVI_Scene (first_file, self.log_handler)
         if enviMask is None:
-             logger.error('Error reading the ENVI file: ' + first_file)
-             return ERROR
+            logger.error('Error reading the ENVI file: ' + first_file)
+            return ERROR
 
         self.ncol = enviMask.NCol
         self.nrow = enviMask.NRow
@@ -779,9 +779,9 @@ class temporalBAStack():
             for season in ['winter', 'spring', 'summer', 'fall']:
                 status = result_queue.get()
                 if status != SUCCESS:
-                    logger.info('Error processing seasonal summaries for year'
-                                ' {0} and season {1}'.format(start_year + i,
-                                                             season))
+                    logger.error('Error processing seasonal summaries for year'
+                                 ' {0} and season {1}'.format(start_year + i,
+                                                              season))
                     return ERROR
 
         endTime = time.time()
@@ -830,6 +830,7 @@ class temporalBAStack():
           3. Good count is the number of 'lloks' with no QA flag set
         """
 
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # determine which scenes apply to the current season in the
         # current year
         last_year = year - 1
@@ -934,10 +935,9 @@ class temporalBAStack():
         # summaries
         for ind in ['band3', 'band4', 'band5', 'band7', 'ndvi', \
             'ndmi', 'nbr', 'nbr2']:
-            msg = '    Generating %d %s summary for %s using %d '  \
-                'files ...' % (year, season, ind, n_files)
-            logIt (msg, self.log_handler)
-            
+            logger.info('    Generating {0} {1} summary for {2} using {3} '
+                        'files ...'.format(year, season, ind, n_files))
+
             # generate the directory name for the index stack
             if (ind == 'ndvi'):
                 dir_name = self.ndvi_dir
@@ -963,8 +963,7 @@ class temporalBAStack():
                 gdalconst.GDT_Int16)
             temp_out_dataset = gdal.Open (temp_file, gdalconst.GA_Update)
             if temp_out_dataset is None:
-                msg = 'Could not create output file: ' + temp_file
-                logIt (msg, self.log_handler)
+                logger.info('Could not create output file: ' + temp_file)
                 return ERROR
     
             temp_out_dataset.SetGeoTransform(self.geotrans)
@@ -984,16 +983,15 @@ class temporalBAStack():
                 temp_file = '%s%s' % (dir_name, base_file)
                 my_ds = gdal.Open (temp_file, gdalconst.GA_ReadOnly)
                 if my_ds is None:
-                    msg = 'Could not open index/band file: ' + temp_file
-                    logIt (msg, self.log_handler)
+                    logger.error('Could not open index/band file: ' +
+                                 temp_file)
                     return ERROR
                 input_ds[i] = my_ds
                 
                 # open the appropriate band in the input image
                 my_temp_band = my_ds.GetRasterBand(1)
                 if my_temp_band is None:
-                    msg = 'Could not open raster band for ' + ind
-                    logIt (msg, self.log_handler)
+                    logger.error('Could not open raster band for ' + ind)
                     return ERROR
                 temp_band[i] = my_temp_band
 
@@ -1073,11 +1071,10 @@ class temporalBAStack():
         Notes:
           1. The seasons will be ignored.
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # make sure the stack file exists
         if not os.path.exists(stack_file):
-            msg = 'Could not open stack file: ' + stack_file
-            logIt (msg, self.log_handler)
+            logger.error('Could not open stack file: ' + stack_file)
             return ERROR
 
         # ignore divide by zero and invalid (NaN) values when doing array
@@ -1088,8 +1085,7 @@ class temporalBAStack():
         startTime = time.time()
         self.csv_data = recfromcsv (stack_file, delimiter=',', names=True)
         if self.csv_data is None:
-            msg = 'Error reading the stack file: ' + stack_file
-            logIt (msg, self.log_handler)
+            logger.error('Error reading the stack file: ' + stack_file)
             return ERROR
 
         # get the sorted, unique years in the stack; grab the first and last
@@ -1097,8 +1093,8 @@ class temporalBAStack():
         years = unique (self.csv_data['year'])
         start_year = years[0]
         end_year = years[len(years)-1]
-        msg = '\nProcessing stack for %d - %d' % (start_year, end_year)
-        logIt (msg, self.log_handler)
+        logger.info('\nProcessing stack for {0} - {1}'.format(start_year,
+                                                              end_year))
 
         # determine band1 file for the first scene listed in the stack
         first_file = self.csv_data['file_'][0]
@@ -1110,8 +1106,7 @@ class temporalBAStack():
         # and other associated info for the stack of scenes
         enviMask = ENVI_Scene (first_file, self.log_handler)
         if enviMask is None:
-             msg = 'Error reading the ENVI file: ' + first_file
-             logIt (msg, self.log_handler)
+             logger.error('Error reading the ENVI file: ' + first_file)
              return ERROR
 
         self.ncol = enviMask.NCol
@@ -1132,9 +1127,9 @@ class temporalBAStack():
  
         # spawn workers to process each year in the stack - generate the
         # seasonal summaries
-        msg = 'Spawning %d years for processing annual maximums via %d '  \
-            'processors ....' % (num_years, self.num_processors)
-        logIt (msg, self.log_handler)
+        logger.info('Spawning {0} years for processing annual maximums via'
+                    ' {1} processors ....'.format(num_years,
+                                                  self.num_processors))
         for i in range(self.num_processors):
             worker = parallelMaxWorker(work_queue, result_queue, self)
             worker.start()
@@ -1143,14 +1138,12 @@ class temporalBAStack():
         for i in range(num_years):
             status = result_queue.get()
             if status != SUCCESS:
-                msg = 'Error processing annual maximums for year %d' %  \
-                    start_year + i
-                logIt (msg, self.log_handler)
+                logger.error('Error processing annual maximums for year {0}'
+                             .format(start_year + i))
                 return ERROR
 
         endTime = time.time()
-        msg = 'Processing time = %f seconds' % (endTime-startTime)
-        logIt (msg, self.log_handler)
+        logger.info('Processing time = {0} seconds'.format(endTime-startTime))
  
         return SUCCESS
 
@@ -1176,14 +1169,14 @@ class temporalBAStack():
           1. Maximums are the max value for each year for ndvi, ndmi, nbr,
              and nbr2.
         """
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
 
         # determine which files apply to the current year
         year_files = (self.csv_data['year'] == year)
         n_files = sum (year_files)
  
         # if there aren't any files to process then skip to the next year
-        msg = '  year = %d,  file count = %d' % (year, n_files)
-        logIt (msg, self.log_handler)
+        logger.info('  year = {0},  file count = {1}'.format(year, n_files))
         if n_files == 0:
             return SUCCESS
  
@@ -1201,8 +1194,7 @@ class temporalBAStack():
             mask_file = '%s%s' % (self.mask_dir, base_file)
             mask_dataset = gdal.Open (mask_file, gdalconst.GA_ReadOnly)
             if mask_dataset is None:
-                msg = 'Could not open mask file: ' + mask_file
-                logIt (msg, self.log_handler)
+                logger.error('Could not open mask file: ' + mask_file)
                 return ERROR
             mask_band = mask_dataset.GetRasterBand(1)
             mask_data[i,:,:] = mask_band.ReadAsArray()
@@ -1220,10 +1212,9 @@ class temporalBAStack():
             
         # loop through indices for which we want to generate maximums
         for ind in ['ndvi', 'ndmi', 'nbr', 'nbr2']:
-            msg = '    Generating %d maximums for %s using %d files ...' % \
-                (year, ind, n_files)
-            logIt (msg, self.log_handler)
-                
+            logger.info('    Generating {0} maximums for {1} using {2} files'
+                        ' ...'.format(year, ind, n_files))
+
             # generate the directory name for the index stack
             ext = '_%s.img' % ind
             if (ind == 'ndvi'):
@@ -1242,8 +1233,7 @@ class temporalBAStack():
                 gdalconst.GDT_Int16)
             temp_out_dataset = gdal.Open (temp_file, gdalconst.GA_Update)
             if temp_out_dataset is None:
-                msg = 'Could not create output file: ' + temp_file
-                logIt (msg, self.log_handler)
+                logger.error('Could not create output file: ' + temp_file)
                 return ERROR
     
             temp_out_dataset.SetGeoTransform(self.geotrans)
@@ -1264,16 +1254,14 @@ class temporalBAStack():
                 temp_file = '%s%s' % (dir_name, base_file)
                 my_ds = gdal.Open (temp_file, gdalconst.GA_ReadOnly)
                 if my_ds is None:
-                    msg = 'Could not open index file: ' + temp_file
-                    logIt (msg, self.log_handler)
+                    logger.error('Could not open index file: ' + temp_file)
                     return ERROR
                 input_ds[i] = my_ds
                 
                 # open band 1 of the index product
                 my_indx_band = my_ds.GetRasterBand(1)
                 if my_indx_band is None:
-                    msg = 'Could not open raster band for ' + ind
-                    logIt (msg, self.log_handler)
+                    logger.error('Could not open raster band for ' + ind)
                     return ERROR
                 indx_band[i] = my_indx_band
 
@@ -1382,12 +1370,11 @@ class temporalBAStack():
              to be grabbed from the command line, then it's assumed all the
              parameters will be pulled from the command line.
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # if no parameters were passed then get the info from the
         # command line
-        msg = 'Start time:' +  \
-            str(datetime.datetime.now().strftime("%b %d %Y %H:%M:%S"))
-        logIt (msg, self.log_handler)
+        logger.info('Start time:' +
+                    str(datetime.datetime.now().strftime("%b %d %Y %H:%M:%S")))
         startTime0 = time.time()
         if input_dir is None:
             # get the command line argument for the input parameters
@@ -1444,7 +1431,7 @@ class temporalBAStack():
             # input directory
             input_dir = options.input_dir
             if input_dir is None:
-                parser.error ("missing input directory command-line argument");
+                parser.error("missing input directory command-line argument")
                 return ERROR
 
             # number of processors
@@ -1454,14 +1441,9 @@ class temporalBAStack():
             self.num_processors = num_processors
             self.delete_src = delete_src
 
-        # open the log file if it exists; use line buffering for the output
-        self.log_handler = None
-        if logfile is not None:
-            self.log_handler = open (logfile, 'w', buffering=1)
-        msg = 'Burned area temporal stack processing of directory: ' +  \
-            input_dir
-        logIt (msg, self.log_handler)
-        
+        logger.info('Burned area temporal stack processing of directory: ' +
+                    input_dir)
+
         # if the input_dir doesn't end with a closing directory path separator
         # then end it with one so that we don't have to add later when
         # concatinating filenames to this directory name
@@ -1471,18 +1453,16 @@ class temporalBAStack():
         # make sure the input directory exists and is writable
         self.input_dir = input_dir
         if not os.path.exists(input_dir):
-            msg = 'Input directory does not exist: ' + input_dir
-            logIt (msg, self.log_handler)
+            logger.error('Input directory does not exist: ' + input_dir)
             return ERROR
 
         if not os.access(input_dir, os.W_OK):
-            msg = 'Input directory is not writable: %s.  Burned area apps ' \
-                'need write access to this directory.' % input_dir
-            logIt (msg, self.log_handler)
+            logger.error('Input directory is not writable: {0}.  Burned area'
+                         ' apps need write access to this directory.'
+                         .format(input_dir))
             return ERROR
-        msg = 'Changing directories for burned area stack processing: ' + \
-            input_dir
-        logIt (msg, self.log_handler)
+        logger.info('Changing directories for burned area stack processing: '
+                    .format(input_dir))
 
         # save the current working directory for return to upon error or when
         # processing is complete
@@ -1505,26 +1485,23 @@ class temporalBAStack():
         list_file = "input_list.txt"
         status = self.generate_list (list_file)
         if status != SUCCESS:
-            msg = 'Error creating the list of files to be processed. ' \
-                'Processing will terminate.'
-            logIt (msg, self.log_handler)
+            logger.error('Error creating the list of files to be processed. '
+                         'Processing will terminate.')
             os.chdir (mydir)
             return ERROR
 
         # run the executable to generate the stack of metadata for the input
         # files.  exit if any errors occur.
-        logIt (msg, self.log_handler)
         stack_file = "input_stack.csv"
         cmdstr = 'generate_stack --list_file=%s --stack_file=%s ' \
             '--verbose' % (list_file, stack_file)
         cmdlist = cmdstr.split(' ')
         try:
             output = subprocess.check_output (cmdlist, stderr=None)
-            logIt (output, self.log_handler)
+            logger.info(output, self.log_handler)
         except subprocess.CalledProcessError, e:
-            msg = 'Error running generate_stack. Processing will ' \
-                'terminate.\n ' + e.output
-            logIt (msg, self.log_handler)
+            logger.error('Error running generate_stack. Processing will '
+                        'terminate.\n ' + e.output)
             os.chdir (mydir)
             return ERROR
 
@@ -1536,43 +1513,39 @@ class temporalBAStack():
         cmdlist = cmdstr.split(' ')
         try:
             output = subprocess.check_output (cmdlist, stderr=None)
-            logIt (output, self.log_handler)
+            logger.info(output, self.log_handler)
         except subprocess.CalledProcessError, e:
-            msg = 'Error running determine_max_extent. Processing will ' \
-                'terminate.\n ' + e.output
-            logIt (msg, self.log_handler)
+            logger.error('Error running determine_max_extent. Processing will '
+                         'terminate.\n ' + e.output)
             os.chdir (mydir)
             return ERROR
 
         # resample the files to the maximum bounding extent of the stack
         # and calculate the spectral indices
         if self.delete_src:
-            msg = 'Original source scenes will be deleted after resampling.'
-            logIt (msg, self.log_handler)
+            logger.error('Original source scenes will be deleted after'
+                        ' resampling.')
 
         status = self.resampleStack (bounding_box_file, stack_file)
         if status != SUCCESS:
-            msg = 'Error resampling the list of files to the max bounding ' \
-                'extents. Processing will terminate.'
-            logIt (msg, self.log_handler)
+            logger.error('Error resampling the list of files to the max'
+                         ' bounding extents. Processing will terminate.')
             os.chdir (mydir)
             return ERROR
 
         # generate the seasonal summaries for each year in the stack
         status = self.generateSeasonalSummaries (stack_file)
         if status != SUCCESS:
-            msg = 'Error generating the seasonal summaries. Processing will ' \
-                'terminate.'
-            logIt (msg, self.log_handler)
+            logger.error('Error generating the seasonal summaries. Processing'
+                         ' will terminate.')
             os.chdir (mydir)
             return ERROR
 
         # generate the annual maximums for each year in the stack
         status = self.generateAnnualMaximums (stack_file)
         if status != SUCCESS:
-            msg = 'Error generating the annual maximums. Processing will ' \
-                'terminate.'
-            logIt (msg, self.log_handler)
+            logger.error('Error generating the annual maximums. Processing'
+                         ' will terminate.')
             os.chdir (mydir)
             return ERROR
 
@@ -1602,13 +1575,11 @@ class temporalBAStack():
 
         # dump out the processing time, convert seconds to hours
         endTime0 = time.time()
-        msg = '***Total stack processing time = %f hours' % \
-            ((endTime0 - startTime0) / 3600.0)
-        logIt (msg, self.log_handler)
+        logger.info('***Total stack processing time = %f hours'
+                    .format((endTime0 - startTime0) / 3600.0))
 
-        msg = 'End time:' + \
-            str(datetime.datetime.now().strftime("%b %d %Y %H:%M:%S"))
-        logIt (msg, self.log_handler)
+        logger.info('End time:' +
+                    str(datetime.datetime.now().strftime("%b %d %Y %H:%M:%S"))
         return SUCCESS
 
 ######end of temporalBAStack class######
