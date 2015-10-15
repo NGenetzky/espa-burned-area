@@ -8,7 +8,7 @@ from osgeo import gdalconst
 import os
 import time
 import shutil
-from log_it import *
+import logging
 
 
 #############################################################################
@@ -85,12 +85,12 @@ class XML_Scene:
             None - error opening or reading the file via GDAL
             Object - successful processing
         """
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
 
         # make sure the file exists then open it with GDAL
         self.xml_file = xml_file               # store the filename
         if not os.path.exists (xml_file):
-            msg = 'Input XML file does not exist: ' + xml_file
-            logIt (msg, log_handler)
+            logger.error('Input XML file does not exist: ' + xml_file)
             return None
 
         # parse the XML file looking for the surface reflectance bands 1-7
@@ -113,87 +113,81 @@ class XML_Scene:
             '_sr_land_water_qa.img')
         self.band_dict['band_adjacent_cloud'] = xml_file.replace ('.xml', \
             '_sr_adjacent_cloud_qa.img')
-        print self.band_dict
+        logger.info(self.band_dict)  # TODO: Should this be debug?
  
         # open connections to the individual bands
         self.dataset1 = gdal.Open(self.band_dict['band1'])
         if self.dataset1 is None:
-            msg = 'GDAL could not open input file: ' + self.band_dict['band1']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band1'])
             return None
 
         self.dataset2 = gdal.Open(self.band_dict['band2'])
         if self.dataset2 is None:
-            msg = 'GDAL could not open input file: ' + self.band_dict['band2']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band2'])
             return None
 
         self.dataset3 = gdal.Open(self.band_dict['band3'])
         if self.dataset3 is None:
-            msg = 'GDAL could not open input file: ' + self.band_dict['band3']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band3'])
             return None
 
         self.dataset4 = gdal.Open(self.band_dict['band4'])
         if self.dataset4 is None:
-            msg = 'GDAL could not open input file: ' + self.band_dict['band4']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band4'])
             return None
 
         self.dataset5 = gdal.Open(self.band_dict['band5'])
         if self.dataset5 is None:
-            msg = 'GDAL could not open input file: ' + self.band_dict['band5']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band5'])
             return None
 
         self.dataset7 = gdal.Open(self.band_dict['band7'])
         if self.dataset7 is None:
-            msg = 'GDAL could not open input file: ' + self.band_dict['band7']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band7'])
             return None
 
         self.dataset_fill_QA = gdal.Open(self.band_dict['band_fill'])
         if self.dataset_fill_QA is None:
-            msg = 'GDAL could not open input file: ' +  \
-                self.band_dict['band_fill']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band_fill'])
             return None
 
         self.dataset_cloud_QA = gdal.Open(self.band_dict['band_cloud'])
         if self.dataset_cloud_QA is None:
-            msg = 'GDAL could not open input file: ' +  \
-                self.band_dict['band_cloud']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band_cloud'])
             return None
 
         self.dataset_shadow_QA = gdal.Open(self.band_dict['band_cloud_shadow'])
         if self.dataset_shadow_QA is None:
-            msg = 'GDAL could not open input file: ' +  \
-                self.band_dict['band_cloud_shadow']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band_cloud_shadow'])
             return None
 
         self.dataset_snow_QA = gdal.Open(self.band_dict['band_snow'])
         if self.dataset_snow_QA is None:
-            msg = 'GDAL could not open input file: ' +  \
-                self.band_dict['band_snow']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band_snow'])
             return None
 
         self.dataset_land_water_QA =  \
             gdal.Open(self.band_dict['band_land_water'])
         if self.dataset_land_water_QA is None:
-            msg = 'GDAL could not open input file: ' +  \
-                self.band_dict['band_land_water']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band_land_water'])
             return None
 
         self.dataset_adjacent_cloud_QA =  \
             gdal.Open(self.band_dict['band_adjacent_cloud'])
         if self.dataset_adjacent_cloud_QA is None:
-            msg = 'GDAL could not open input file: ' +  \
-                self.band_dict['band_adjacent_cloud']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         self.band_dict['band_adjacent_cloud'])
 
         # create connections to the bands
         self.band1 = self.dataset1.GetRasterBand(1)
@@ -212,52 +206,40 @@ class XML_Scene:
 
         # verify the bands were actually accessed successfully
         if self.band1 is None:
-            msg = 'Input band1 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band1 connection failed')
             return None
         if self.band2 is None:
-            msg = 'Input band2 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band2 connection failed')
             return None
         if self.band3 is None:
-            msg = 'Input band3 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band3 connection failed')
             return None
         if self.band4 is None:
-            msg = 'Input band4 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band4 connection failed')
             return None
         if self.band5 is None:
-            msg = 'Input band5 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band5 connection failed')
             return None
         if self.band7 is None:
-            msg = 'Input band7 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band7 connection failed')
             return None
         if self.band_fill_QA is None:
-            msg = 'Input band_fill_QA connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band_fill_QA connection failed')
             return None
         if self.band_cloud_QA is None:
-            msg = 'Input band_cloud_QA connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band_cloud_QA connection failed')
             return None
         if self.band_shadow_QA is None:
-            msg = 'Input band_shadow_QA connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band_shadow_QA connection failed')
             return None
         if self.band_snow_QA is None:
-            msg = 'Input band_snow_QA connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band_snow_QA connection failed')
             return None
         if self.band_land_water_QA is None:
-            msg = 'Input band_land_water_QA connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band_land_water_QA connection failed')
             return None
         if self.band_adjacent_cloud_QA is None:
-            msg = 'Input band_adjacent_cloud_QA connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band_adjacent_cloud_QA connection failed')
             return None
 
         # get coordinate information from band 1, get the number of rows
@@ -591,11 +573,12 @@ class XML_Scene:
                 QA bands
             Array - associated band of data
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         if not (band in ['band1', 'band2', 'band3', 'band4', 'band5', \
             'band7', 'band_qa']):
-            print 'Band ' + band + 'is not supported. Needs to be one of ' \
-                'band1, band2, band3, band4, band5, band7, or band_qa.'
+            logger.error('Band {0} is not supported. Needs to be one of '
+                         'band1, band2, band3, band4, band5, band7,'
+                         ' or band_qa.'.format(band))
             return None
 
         # read and return the specified band
@@ -617,7 +600,7 @@ class XML_Scene:
         elif band == 'band7':
             return (self.band7.ReadAsArray())
 
-        elif band == 'band_qa':        
+        elif band == 'band_qa':
             # read all the QA-related bands
             fill_QA = self.band_fill_QA.ReadAsArray()
             snow_QA = self.band_snow_QA.ReadAsArray()

@@ -759,7 +759,8 @@ class temporalBAStack():
 
         for year in range (start_year, end_year+1):
             for season in ['winter', 'spring', 'summer', 'fall']:
-                print "Pushing %d, %s to the queue" % (year, season)
+                logger.info('Pushing {0}, {1} to the queue'.format(year,
+                                                                   season))
                 work_queue.put([year, season])
 
         # create a queue to pass to workers to store the processing status
@@ -997,10 +998,10 @@ class temporalBAStack():
 
             # loop through each line in the image and process
             for y in range (0, self.nrow):
-#                print 'Line: %d' % y
+#                logger.debug('Line: {0}'.format(y))
                 # loop through the current set of files and process them
                 for i in range(0, n_files):
-#                    print '  Stacking file: ' + files[i]
+#                    logger.debug('  Stacking file: ' + files[i])
                     # read the current row of data
                     my_temp_band = temp_band[i]
                     band_data[i,:] = my_temp_band.ReadAsArray(0, y,  \
@@ -1267,10 +1268,10 @@ class temporalBAStack():
 
             # loop through each line in the image and process
             for y in range (0, self.nrow):
-#                print 'Line: %d' % y
+#                logger.info('Line: {0}'.format(y))
                 # loop through the current set of files and process them
                 for i in range(0, n_files):
-#                    print '  Stacking file: ' + files[i]
+#                    logger.info('  Stacking file: ' + files[i])
                     # read the current row of data
                     my_indx_band = indx_band[i]
                     indx_data[i,:] = my_indx_band.ReadAsArray(0, y,  \
@@ -1567,7 +1568,7 @@ class temporalBAStack():
                 xml_file = os.path.basename (full_xml_file.replace ('.xml', ''))
                 rm_files = glob.glob (mydir + xml_file + '*')
                 for file in rm_files:
-                    print 'Remove: ' + file
+                    logger.info('Remove: ' + file)
                     os.remove (os.path.join (file))
 
         # close the stack file

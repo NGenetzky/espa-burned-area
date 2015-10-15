@@ -8,8 +8,7 @@ from osgeo import osr
 from osgeo import gdal_array
 from osgeo import gdalconst
 from spectral_indices import *
-from log_it import *
-
+import logging
 
 #############################################################################
 # Created on May 1, 2013 by Gail Schmidt, USGS/EROS
@@ -36,7 +35,7 @@ class spectralIndex:
     dataset3 = None
     dataset4 = None
     dataset5 = None
-    dataset7 = None 
+    dataset7 = None
     dataset_mask = None             # QA mask created from QA bands
 
     # bands
@@ -70,49 +69,48 @@ class spectralIndex:
             None - error opening the file
             Object - successful processing
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # open connections to the individual bands
         self.dataset1 = gdal.Open(band_dict['band1'])
         if self.dataset1 is None:
-            msg = 'GDAL could not open input file: ' + band_dict['band1']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         band_dict['band1'])
             return None
 
         self.dataset2 = gdal.Open(band_dict['band2'])
         if self.dataset2 is None:
-            msg = 'GDAL could not open input file: ' + band_dict['band2']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         band_dict['band2'])
             return None
 
         self.dataset3 = gdal.Open(band_dict['band3'])
         if self.dataset3 is None:
-            msg = 'GDAL could not open input file: ' + band_dict['band3']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         band_dict['band3'])
             return None
 
         self.dataset4 = gdal.Open(band_dict['band4'])
         if self.dataset4 is None:
-            msg = 'GDAL could not open input file: ' + band_dict['band4']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         band_dict['band4'])
             return None
 
         self.dataset5 = gdal.Open(band_dict['band5'])
         if self.dataset5 is None:
-            msg = 'GDAL could not open input file: ' + band_dict['band5']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         band_dict['band5'])
             return None
 
         self.dataset7 = gdal.Open(band_dict['band7'])
         if self.dataset7 is None:
-            msg = 'GDAL could not open input file: ' + band_dict['band7']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input file: ' +
+                         band_dict['band7'])
             return None
 
         self.dataset_mask = gdal.Open(band_dict['band_qa'])
         if self.dataset_mask is None:
-            msg = 'GDAL could not open input mask file: ' +  \
-                band_dict['band_qa']
-            logIt (msg, log_handler)
+            logger.error('GDAL could not open input mask file: ' +
+                         band_dict['band_qa'])
             return None
 
         # create connections to the bands
@@ -126,32 +124,25 @@ class spectralIndex:
 
         # verify the bands were actually accessed successfully
         if self.band1 is None:
-            msg = 'Input band1 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band1 connection failed')
             return None
         if self.band2 is None:
-            msg = 'Input band2 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band2 connection failed')
             return None
         if self.band3 is None:
-            msg = 'Input band3 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band3 connection failed')
             return None
         if self.band4 is None:
-            msg = 'Input band4 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band4 connection failed')
             return None
         if self.band5 is None:
-            msg = 'Input band5 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band5 connection failed')
             return None
         if self.band7 is None:
-            msg = 'Input band7 connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band7 connection failed')
             return None
         if self.band_mask is None:
-            msg = 'Input band_mask connection failed'
-            logIt (msg, log_handler)
+            logger.error('Input band_mask connection failed')
             return None
 
 
@@ -237,15 +228,14 @@ class spectralIndex:
         for index in index_dict.keys():
             # figure out which spectral index to generate
             if not (index in ['ndvi','ndmi','nbr','nbr2']):
-                msg = 'Algorithm for %s is not implemented' % index
-                logIt (msg, log_handler)
+                logger.error('Algorithm for {0} is not implemented'
+                             .format(index))
                 return ERROR
 
             # create the output folder if it does not exist
             output_dir = os.path.dirname(index_dict[index])
             if not os.path.exists(output_dir):
-                msg = 'Creating output directory ' + output_dir
-                logIt (msg, log_handler)
+                logger.info('Creating output directory ' + output_dir)
                 os.makedirs(output_dir)
 
             # create the output file; spectral indices are multiplied by 1000.0
