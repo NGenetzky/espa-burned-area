@@ -28,7 +28,6 @@ import os
 import time
 import getopt
 import multiprocessing, Queue
-import logging
 
 import numpy
 import scipy.ndimage
@@ -67,7 +66,7 @@ class parallelSceneThresholdWorker(multiprocessing.Process):
  
 
     def run(self):
-        logger = logging.getLogger(__name__)
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         while not self.kill_received:
             # get a task
             try:
@@ -76,12 +75,13 @@ class parallelSceneThresholdWorker(multiprocessing.Process):
                 break
  
             # process the scene
-            logger.info('Processing {0} ...'.format(xml_file))
+            msg = 'Processing %s ...' % xml_file
+            logger.info(msg)
             status = self.stackObject.sceneBurnThreshold (xml_file)
             if status != SUCCESS:
-                logger.error('Error running burn thresholding on the XML file '
-                             '({0}). Processing will terminate.'
-                             .format(xml_file))
+                msg = 'Error running burn thresholding on the XML file ' \
+                    '(%s). Processing will terminate.' % xml_file
+                logger.info(msg)
  
             # store the result
             self.result_queue.put(status)
@@ -215,7 +215,9 @@ class BurnAreaThreshold():
         
         
     def findBurnScars(self, bp_image, seed_prob_thresh=97.5,
-        seed_size_thresh=5, flood_fill_prob_thresh=75, log_handler=None):
+        seed_size_thresh=5, flood_fill_prob_thresh=75
+        # , log_handler=None
+        ):
         """Identify the seeds for burn scars from the input burn probabilities.
         Description: routine to find burn scars using the flood-fill approach.
           Seed pixels are found by using the seed threshold.  Any pixels with
@@ -261,6 +263,7 @@ class BurnAreaThreshold():
           1. The default lower threshold for flood filling is 75% burn
              probability.
         """
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
     
         # set up array to hold filled region labels, initialize to 0s which
         # means unburned
@@ -274,9 +277,9 @@ class BurnAreaThreshold():
         # regions will be the start of the flood-fill algorithm
         bp_seed_regions = numpy.zeros_like(bp_seeds, dtype=numpy.int32)
         n_seed_labels = scipy.ndimage.label(bp_seeds, output=bp_seed_regions)
-        logger.info('Found {0} seeds to use for flood fill'
-                    .format(n_seed_labels))
-
+        msg = 'Found %d seeds to use for flood fill' % n_seed_labels
+        logger.info(msg)
+        
         # get list of region pixel coordinates, use the first pixel from each
         # as the seed for the region
         bp_region_coords = skimage.measure.regionprops(  \
@@ -307,6 +310,16 @@ class BurnAreaThreshold():
                     print 'Number of pixels in region:', temp_area
                     print 'First coordinate:', temp_coords
                     print 'Filled pixels:', nFilled
+
+                    # logger.info('#' * 80) # Creates header bar:############################################################
+ 
+                    logger.info('''{0}
+Seed region label:{1}
+Number of pixels in region:{2}
+First coordinate:{3}
+Filled pixels:{4}'''
+                                .format('80' * 60, temp_label, temp_area,
+                                        temp_coords, nFilled))
         
         
         # find region properties for the flood filled burn areas
@@ -367,6 +380,7 @@ class BurnAreaThreshold():
             then it will be set to -9999 which has been the common value
             used for the overall burned area applications.
         """
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
 
         # determine the output classification name
         fname = os.path.basename(bp_file).replace('burn_probability.img', \
@@ -431,7 +445,8 @@ class BurnAreaThreshold():
         bp_rats.append(bp_scar_results[1])
             
         # output the burn classifications for this scene
-        logger.info('Writing output to {} ... '.format(bc_file_name))
+        msg = 'Writing output to %s ... ' % bc_file_name
+        logger.info(msg)
         self.writeResults(outputData=bp_scar_results[0],
             outputFilename=bc_file_name, geotrans=geotrans, prj=prj,
             nodata=nodata, outputRAT=bp_scar_results[1])
@@ -496,6 +511,7 @@ class BurnAreaThreshold():
             ERROR - error running the burn threshold application
             SUCCESS - successful processing
         """
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
 
         # if no parameters were passed then get the info from the command line
         if stack_file is None:
@@ -590,7 +606,11 @@ class BurnAreaThreshold():
         else:
             num_processors = num_processors
 
-        logger = logging.getLogger(__name__)
+        # open the log file if it exists; use line buffering for the output
+        log_handler = None
+        if logfile is not None:
+            log_handler = open (logfile, 'w', buffering=1)
+        self.log_handler = log_handler
         self.seed_prob_thresh = seed_prob_thresh
         self.seed_size_thresh = seed_size_thresh
         self.flood_fill_prob_thresh = flood_fill_prob_thresh
@@ -598,44 +618,46 @@ class BurnAreaThreshold():
         # validate options and arguments
         if start_year is not None:
             if (start_year < 1984):
-                logger.error('start_year cannot begin before 1984: {0}'
-                            .format(start_year))
+                msg = 'start_year cannot begin before 1984: %d' % start_year
+                logger.error(msg)
                 return ERROR
 
         if end_year is not None:
             if (end_year < 1984):
-                logger.info('end_year cannot begin before 1984: {0}'
-                            .format(end_year))
+                msg = 'end_year cannot begin before 1984: %d' % end_year
+                logger.error(msg)
                 return ERROR
 
         if (end_year is not None) & (start_year is not None):
             if end_year < start_year:
                 msg = 'end_year (%d) is less than start_year (%d)' %  \
                     (end_year, start_year)
-                logger.info(msg, log_handler)
+                logger.error(msg)
                 return ERROR
             
         if not os.path.exists(stack_file):
             msg = 'CSV stack file does not exist: ' + stack_file
-            logger.info(msg, log_handler)
+            logger.error(msg)
             return ERROR
     
         if not os.path.exists(input_dir):
             msg = 'Input directory does not exist: ' + input_dir
-            logger.info(msg, log_handler)
+            logger.error(msg)
             return ERROR
     
         if not os.path.exists(output_dir):
-            logger.info('Output directory does not exist: {0}. Creating ...'
-                        .format(output_dir))
+            msg = 'Output directory does not exist: %s. Creating ...' % \
+                output_dir
+            logger.error(msg)
             os.makedirs(output_dir, 0755)
         self.output_dir = output_dir
 
         # save the current working directory for return to upon error or when
         # processing is complete
         mydir = os.getcwd()
-        logger.info('Changing directories for burn threshold processing: ' +
-                    output_dir)
+        msg = 'Changing directories for burn threshold processing: ' +  \
+            output_dir
+        logger.info(msg)
         os.chdir (output_dir)
 
         # open the stack file
@@ -658,14 +680,14 @@ class BurnAreaThreshold():
         
         # read the input data from the stack, for the years specified
         msg = 'Processing burn probabilities for %d-%d' % (start_year, end_year)
-        logger.info(msg, log_handler)
+        logger.info(msg)
         msg = '  seed probability threshold: %f' % seed_prob_thresh
-        logger.info(msg, log_handler)
+        logger.info(msg)
         msg = '  seed size threshold: %d' % seed_size_thresh
-        logger.info(msg, log_handler)
+        logger.info(msg)
         msg = '  flood fill probability threshold: %f' %  \
             flood_fill_prob_thresh
-        logger.info(msg, log_handler)
+        logger.info(msg)
 
         # load up the work queue for processing scenes in parallel for burn
         # thresholding
@@ -678,7 +700,7 @@ class BurnAreaThreshold():
             bp_file_name = xml_file.replace('.xml','_burn_probability.img')
             if not os.path.exists(bp_file_name):
                 msg = 'burn probability file does not exist: ' +  bp_file_name
-                logger.info(msg, log_handler)
+                logger.info(msg)
                 os.chdir (mydir)
                 return ERROR
 
@@ -691,8 +713,9 @@ class BurnAreaThreshold():
  
         # spawn workers to process each scene in the stack - run the burn
         # thresholding on each scene in the stack
-        logger.info('Spawning {0} scenes for burn thresholding via {1} '
-                    'processors ....'.format(num_scenes, num_processors))
+        msg = 'Spawning %d scenes for burn thresholding via %d '  \
+            'processors ....' % (num_scenes, num_processors)
+        logger.info(msg)
         for i in range(num_processors):
             worker = parallelSceneThresholdWorker(work_queue, result_queue,
                 self)
@@ -702,13 +725,14 @@ class BurnAreaThreshold():
         for i in range(num_scenes):
             status = result_queue.get()
             if status != SUCCESS:
-                logger.info('Error in burn threshold for {0} file in the list '
-                            '(associated XML file is {1}).'
-                            .format(i, stack2['file_'][i])
+                msg = 'Error in burn threshold for %d file in the list '  \
+                    '(associated XML file is %s).' % (i, stack2['file_'][i])
+                logger.info(msg)
                 return ERROR
 
         # successful completion.  return to the original directory.
-        logger.info('Completion of burn threshold.')
+        msg = 'Completion of burn threshold.'
+        logger.info(msg)
         if logfile is not None:
             log_handler.close()
         os.chdir (mydir)

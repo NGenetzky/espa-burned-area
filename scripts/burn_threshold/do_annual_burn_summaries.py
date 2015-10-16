@@ -24,6 +24,7 @@ import time
 import datetime as datetime_
 import getopt
 import csv
+import logging
 
 import numpy
 
@@ -38,23 +39,6 @@ import metadata_api
 
 ERROR = 1
 SUCCESS = 0
-
-def logIt (msg, log_handler):
-    """Logs the user-specified message.
-    logIt logs the information to the logfile (if valid) or to stdout if the
-    logfile is None.
-
-    Args:
-      msg - message to be printed/logged
-      log_handler - log file handler; if None then print to stdout
-
-    Returns: nothing
-    """
-
-    if log_handler is None:
-        print msg
-    else:
-        log_handler.write (msg + '\n')
 
 
 def convert_imageXY_to_mapXY (image_x, image_y, transform):
@@ -139,6 +123,7 @@ class AnnualBurnSummary():
             ERROR - error creating the XML file
             SUCCESS - successful creation of the XML file
         """
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
 
         # parse the scene-based XML file, just as a basis for the output XML
         # file.  the global attributes will be similar, but the extents and
@@ -159,33 +144,30 @@ class AnnualBurnSummary():
         # information
         ds = gdal.Open (imgfile)
         if ds is None:
-            msg = "GDAL failed to open %s" % imgfile
-            logIt (msg, log_handler)
+            logger.error('GDAL failed to open {0}'.format(imgfile))
             return ERROR
 
         ds_band = ds.GetRasterBand (1)
         if ds_band is None:
-            msg = "GDAL failed to get the first band in %s" % imgfile
-            logIt (msg, log_handler)
+            logger.error('GDAL failed to get the first band in {0}'
+                        .format(imgfile))
             return ERROR
         nlines = float(ds_band.YSize)
         nsamps = float(ds_band.XSize)
-        nlines_int = ds_band.YSize 
-        nsamps_int = ds_band.XSize 
+        nlines_int = ds_band.YSize
+        nsamps_int = ds_band.XSize
         del (ds_band)
 
         ds_transform = ds.GetGeoTransform()
         if ds_transform is None:
-            msg = "GDAL failed to get the geographic transform information " \
-                "from %s" % imgfile
-            logIt (msg, log_handler)
+            logger.error('GDAL failed to get the geographic transform'
+                        'information from {0}'.format(imgfile))
             return ERROR
 
         ds_srs = osr.SpatialReference()
         if ds_srs is None:
-            msg = "GDAL failed to get the spatial reference information " \
-                "from %s" % imgfile
-            logIt (msg, log_handler)
+            logger.error('GDAL failed to get the spatial reference information'
+                        ' from {0}'.format(imgfile))
             return ERROR
         ds_srs.ImportFromWkt (ds.GetProjection())
         del (ds)
@@ -433,9 +415,8 @@ class AnnualBurnSummary():
         # call the export with validation
         fd = open (output_xml_file, 'w')
         if fd == None:
-            msg = "Unable to open the output XML file (%s) for writing." % \
-                output_xml_file
-            logIt (msg, log_handler)
+            logger.error('Unable to open the output XML file ({0}) for writing.'
+                        .format(output_xml_file))
             return ERROR
 
         metadata_api.export (fd, xml)
@@ -491,6 +472,7 @@ class AnnualBurnSummary():
             ERROR - error running the annual burn summary application
             SUCCESS - successful processing
         """
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
 
         # if no parameters were passed then get the info from the command line
         if stack_file is None:
@@ -559,58 +541,49 @@ class AnnualBurnSummary():
             if options.end_year is not None:
                 end_year = options.end_year
 
-        # open the log file if it exists; use line buffering for the output
-        log_handler = None
-        if logfile is not None:
-            log_handler = open (logfile, 'w', buffering=1)
-
         # validate options and arguments
         if start_year is not None:
             if (start_year < 1984):
-                msg = 'start_year cannot begin before 1984: %d' % start_year
-                logIt (msg, log_handler)
+                logger.error('start_year cannot begin before 1984: {0}'
+                            .format(start_year))
                 return ERROR
 
         if end_year is not None:
             if (end_year < 1984):
-                msg = 'end_year cannot begin before 1984: %d' % end_year
-                logIt (msg, log_handler)
+                logger.error('end_year cannot begin before 1984: {0}'
+                            .format(end_year))
                 return ERROR
 
         if (end_year is not None) & (start_year is not None):
             if end_year < start_year:
-                msg = 'end_year (%d) is less than start_year (%d)' %  \
-                    (end_year, start_year)
-                logIt (msg, log_handler)
+                logger.error('end_year ({0}) is less than start_year ({0})'
+                            .format(end_year, start_year))
                 return ERROR
 
         if not os.path.exists(stack_file):
-            msg = 'CSV stack file does not exist: ' + stack_file
-            logIt (msg, log_handler)
+            logger.error('CSV stack file does not exist: ' + stack_file)
             return ERROR
 
         if not os.path.exists(bp_dir):
-            msg = 'Burn probability directory does not exist: ' + bp_dir
-            logIt (msg, log_handler)
+            logger.error('Burn probability directory does not exist: ' +
+                        bp_dir)
             return ERROR
     
         if not os.path.exists(bc_dir):
-            msg = 'Burn classificaton directory does not exist: ' + bc_dir
-            logIt (msg, log_handler)
+            logger.error('Burn classificaton directory does not exist: ' +
+                        bc_dir)
             return ERROR
     
         if not os.path.exists(output_dir):
-            msg = 'Output directory does not exist: %s. Creating ...' %  \
-                output_dir
-            logIt (msg, log_handler)
+            logger.error('Output directory does not exist: {0}. Creating ...'
+                        .format(output_dir))
             os.makedirs(output_dir, 0755)
 
         # save the current working directory for return to upon error or when
         # processing is complete
         mydir = os.getcwd()
-        msg = 'Changing directories for burn threshold processing: ' +  \
-            output_dir
-        logIt (msg, log_handler)
+        logger.info('Changing directories for burn threshold processing: ' +
+                    output_dir)
         os.chdir (output_dir)
 
         # start of threshold processing
@@ -642,51 +615,46 @@ class AnnualBurnSummary():
             ('.xml','_burn_probability.img')
         bp_file = bp_dir + '/' + fname
         if not os.path.exists(bp_file):
-            msg = 'burn probability file does not exist: ' + bp_file
-            logIt (msg, log_handler)
+            logger.error('burn probability file does not exist: ' + bp_file)
             os.chdir (mydir)
             return ERROR
 
         bp_dataset = gdal.Open(bp_file)
         if bp_dataset is None:
-            msg = 'Failed to open bp file: ' + bp_file
-            logIt (msg, log_handler)
+            logger.error('Failed to open bp file: ' + bp_file)
             os.chdir (mydir)
             return ERROR
         
         bp_band = bp_dataset.GetRasterBand(1)
         if bp_band is None:
-            msg = 'Failed to open bp band 1 from ' + bp_file
-            logIt (msg, log_handler)
+            logger.error('Failed to open bp band 1 from ' + bp_file)
             os.chdir (mydir)
             return ERROR
         
         geotrans = bp_dataset.GetGeoTransform()
         if geotrans is None:
-            msg = 'Failed to obtain the GeoTransform info from ' + bp_file
-            logIt (msg, log_handler)
+            logger.error('Failed to obtain the GeoTransform info from ' +
+                         bp_file)
             return ERROR
 
         prj = bp_dataset.GetProjectionRef()
         if prj is None:
-            msg = 'Failed to obtain the ProjectionRef info from ' + bp_file
-            logIt (msg, log_handler)
+            logger.error('Failed to obtain the ProjectionRef info from ' +
+                        bp_file)
             return ERROR
 
         nrow = bp_dataset.RasterYSize
         ncol = bp_dataset.RasterXSize
         if (nrow is None) or (ncol is None):
-            msg = 'Failed to obtain the RasterXSize and RasterYSize from ' +  \
-                bp_file
-            logIt (msg, log_handler)
+            logger.error('Failed to obtain the RasterXSize and RasterYSize'
+                        ' from ' + bp_file)
             return ERROR
 
         nodata = bp_band.GetNoDataValue()
         if nodata is None:
             nodata = -9999
-            msg = 'Failed to obtain the NoDataValue from %s.  Using %d.' % \
-                (bp_file, nodata)
-            logIt (msg, log_handler)
+            logger.error('Failed to obtain the NoDataValue from {0}.  Using {1}
+                        '.format(bp_file, nodata))
 
         # close the file
         bp_band = None
@@ -703,14 +671,12 @@ class AnnualBurnSummary():
         #    4. maximum probability for burned area (max_burn_prob)
     
         # loop through the years in the stack
-        msg = 'Processing burn files for %d-%d' % (start_year, end_year)
-        logIt (msg, log_handler)
-        for year in range(start_year,end_year+1):
-            msg = '########################################################'
-            logIt (msg, log_handler)
-            msg = 'Processing %d ...' % year
-            logIt (msg, log_handler)
-                
+        logger.info('Processing burn files for {0}-{1}'.format(start_year,
+                                                               end_year))
+        for year in range(start_year, end_year+1):
+            logger.info('########################################################')
+            logger.info('Processing {0} ...'.format(year))
+
             stack_mask = stack2['year'] == year
             stack3 = stack2[stack_mask]
 
@@ -732,13 +698,12 @@ class AnnualBurnSummary():
                     ('.xml','_burn_probability.img')
                 bp_file = bp_dir + '/' + fname
                 if not os.path.exists(bp_file):
-                    msg = 'burn probability file does not exist: ' + bp_file
-                    logIt (msg, log_handler)
+                    logger.error('burn probability file does not exist: ' +
+                                bp_file)
                     os.chdir (mydir)
                     return ERROR
 
-                msg = '    Reading %s ...' % bp_file
-                logIt (msg, log_handler)
+                logger.info('    Reading {0} ...'.format(bp_file))
                 input_datasets[i,0] = gdal.Open(bp_file)
                 input_bands[i,0] = input_datasets[i,0].GetRasterBand(1)
 
@@ -746,13 +711,12 @@ class AnnualBurnSummary():
                     ('.xml','_burn_class.img')
                 bc_name = bc_dir + '/' + fname
                 if not os.path.exists(bc_name):
-                    msg = 'burn classification file does not exist: ' + bc_name
-                    logIt (msg, log_handler)
+                    logger.error('burn classification file does not exist: ' +
+                                bc_name)
                     os.chdir (mydir)
                     return ERROR
 
-                msg = '    Reading %s ...' % bc_name
-                logIt (msg, log_handler)
+                logger.info('    Reading {0} ...'.format(bc_name))
                 input_datasets[i,1] = gdal.Open(bc_name)
                 input_bands[i,1] = input_datasets[i,1].GetRasterBand(1)
 
@@ -892,15 +856,13 @@ class AnnualBurnSummary():
         status = self.createXML (xml_file, output_xml_file, start_year,
             end_year, nodata, fname, log_handler)
         if status != SUCCESS:
-            msg = 'Failed to write the output XML file: ' + output_xml_file
-            logIt (msg, log_handler)
+            logger.error('Failed to write the output XML file: ' +
+                         output_xml_file)
             return ERROR
 
         # successful completion.  return to the original directory.
-        msg = 'Completion of annual burn summaries.'
-        logIt (msg, log_handler)
-        if logfile is not None:
-            log_handler.close()
+        logger.info('Completion of annual burn summaries.')
+
         os.chdir (mydir)
         return SUCCESS
 
