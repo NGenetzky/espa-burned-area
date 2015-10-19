@@ -5,7 +5,7 @@ import re
 import subprocess
 import datetime
 from argparse import ArgumentParser
-from log_it import *
+import logging
 
 
 #######################################################################
@@ -60,6 +60,7 @@ class BoostedRegression():
              configuration file, then the location of those input/output files
              will need to be the location of the configuration file.
         """
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
 
         # if no parameters were passed then get the info from the command line
         if config_file is None:
@@ -101,19 +102,16 @@ class BoostedRegression():
             # get the BIN dir environment variable
             bin_dir = os.environ.get('BIN')
             bin_dir = bin_dir + '/'
-            msg = 'BIN environment variable: %s' % bin_dir
-            logIt (msg, log_handler)
+            logger.info('BIN environment variable: {0}'.format(bin_dir))
         else:
             # don't use a path to the boosted regression application
             bin_dir = ""
-            msg = 'boosted regression executable expected to be in the PATH'
-            logIt (msg, log_handler)
+            logger.info('boosted regression executable expected to be in the PATH')
         
         # make sure the configuration file exists
         if not os.path.isfile(config_file):
-            msg = 'Error: configuration file does not exist or is not ' \
-                'accessible: %s' % config_file
-            logIt (msg, log_handler)
+            logger.error('Error: configuration file does not exist or is not '
+                        'accessible: %s'.format(config_file))
             return ERROR
 
         # get the path of the config file and change directory to that location
@@ -125,15 +123,15 @@ class BoostedRegression():
         mydir = os.getcwd()
         configdir = os.path.dirname (os.path.abspath (config_file))
         if not os.access(configdir, os.W_OK):
-            msg = 'Path of configuration file is not writable: %s.  Boosted ' \
-                'regression may need write access to the configuration '  \
-                'directory, depending on whether the output files in the '  \
-                'configuration file have been specified.' % configdir
-            logIt (msg, log_handler)
+            # Could be made more pep8 compliant
+            logger.error('Path of configuration file is not writable: {0}.  Boosted '
+                        'regression may need write access to the configuration '
+                        'directory, depending on whether the output files in the '
+                        'configuration file have been specified.'
+                        .format(configdir))
             return ERROR
-        msg = 'Changing directories for boosted regression processing: %s' % \
-            configdir
-        logIt (msg, log_handler)
+        logger.info('Changing directories for boosted regression processing:'
+                    ' {a0}'.format(configdir))
         os.chdir (configdir)
 
         # run boosted regression algorithm, checking the return status.  exit
@@ -143,19 +141,16 @@ class BoostedRegression():
         cmdlist = cmdstr.split(' ')
         try:
             output = subprocess.check_output (cmdlist, stderr=None)
-            logIt (output, log_handler)
+            logger.info(output)
         except subprocess.CalledProcessError, e:
-            msg = 'Error running boosted regression. Processing will '  \
-                'terminate.\n ' + e.output
-            logIt (msg, log_handler)
+            logger.error('Error running boosted regression. Processing will '
+                        'terminate.\n ' + e.output)
             os.chdir (mydir)
             return ERROR
-        
+
         # successful completion.  return to the original directory.
-        msg = 'Completion of boosted regression.'
-        logIt (msg, log_handler)
-        if logfile is not None:
-            log_handler.close()
+        logger.info('Completion of boosted regression.')
+
         os.chdir (mydir)
         return SUCCESS
 
