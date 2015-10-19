@@ -94,8 +94,7 @@ class AnnualBurnSummary():
 
 
     def createXML(self, scene_xml_file=None, output_xml_file=None,
-        start_year=None, end_year=None, fill_value=None, imgfile=None,
-        log_handler=None):
+        start_year=None, end_year=None, fill_value=None, imgfile=None):
         """Creates an XML file for the products produced by
            runAnnualBurnSummaries.
         Description: routine to create the XML file for the burned area summary
@@ -117,7 +116,6 @@ class AnnualBurnSummary():
           imgfile - name of burned area image file with associated ENVI header
               which can be used to obtain the extents and geographic
               information for these products
-          log_handler - handler for the logging information
    
         Returns:
             ERROR - error creating the XML file
@@ -427,7 +425,7 @@ class AnnualBurnSummary():
 
 
     def runAnnualBurnSummaries(self, stack_file=None, bp_dir=None, bc_dir=None,
-        output_dir=None, start_year=None, end_year=None, logfile=None):
+        output_dir=None, start_year=None, end_year=None):
         """Processes the annual burn summaries for each year in the stack.
         Description: routine to process the annual burn summaries for each
             pixel.
@@ -465,8 +463,6 @@ class AnnualBurnSummary():
               to start with the lowest year + 1
           end_year - ending year of the stack_file to process; default is to end
               with the highest year
-          logfile - name of the logfile for logging information; if None then
-              the output will be written to stdout
    
         Returns:
             ERROR - error running the annual burn summary application
@@ -507,8 +503,6 @@ class AnnualBurnSummary():
                     'probabilities; default is to use the maximum year '  \
                     'of the files in the stack_file',
                 metavar='YEAR')
-            parser.add_argument ('-l', '--logfile', type=str, dest='logfile',
-                help='name of optional log file', metavar='FILE')
 
             options = parser.parse_args()
 
@@ -674,7 +668,7 @@ class AnnualBurnSummary():
         logger.info('Processing burn files for {0}-{1}'.format(start_year,
                                                                end_year))
         for year in range(start_year, end_year+1):
-            logger.info('########################################################')
+            logger.info('#' * 56)
             logger.info('Processing {0} ...'.format(year))
 
             stack_mask = stack2['year'] == year
@@ -854,7 +848,7 @@ class AnnualBurnSummary():
             ('.xml','_burn_probability.img')
         output_xml_file = "burned_area_%d_%d.xml" % (start_year, end_year)
         status = self.createXML (xml_file, output_xml_file, start_year,
-            end_year, nodata, fname, log_handler)
+            end_year, nodata, fname)
         if status != SUCCESS:
             logger.error('Failed to write the output XML file: ' +
                          output_xml_file)

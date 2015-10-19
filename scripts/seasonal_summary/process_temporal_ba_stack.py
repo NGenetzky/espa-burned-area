@@ -59,7 +59,6 @@ class temporalBAStack():
     mask_dir = "None"         # QA mask data directory
     spatial_extent = None     # dictionary for spatial extent corners
     delete_src = None         # should original scenes be deleted
-    log_handler = None        # file handler for the log file
     num_processors = 1        # default is no parallel processing
     csv_data = None           # CSV data for the stack
     nrow = 0                  # number of rows in stack for seasonal summaries
@@ -596,7 +595,7 @@ class temporalBAStack():
             return ERROR
 
         # create a single QA band from the surface reflectance QA bands
-        xmlAttr.createQaBand (self.log_handler)
+        xmlAttr.createQaBand ()
 
         # resample the .img and single QA bands to our maximum bounding coords
         # and place in the reflectance directory; QA file goes in the mask
@@ -650,7 +649,7 @@ class temporalBAStack():
 
         # calculate ndvi, ndmi, nbr, nbr2 from the resampled files
         logger.info('   Calculating spectral indices...')
-        specIndx = spectralIndex (resamp_band_dict, self.log_handler)
+        specIndx = spectralIndex (resamp_band_dict)
         if specIndx == None:
             logger.error('Error generating the spectral indices for ' +
                          xml_file)
@@ -665,7 +664,7 @@ class temporalBAStack():
             os.path.basename (xml_file.replace ('.xml', '_nbr.img'))
         idx_dict['nbr2'] = self.nbr2_dir +  \
             os.path.basename (xml_file.replace ('.xml', '_nbr2.img'))
-        status = specIndx.createSpectralIndices (idx_dict, self.log_handler)
+        status = specIndx.createSpectralIndices (idx_dict)
         if status != SUCCESS:
             logger.error('Error creating the spectral indices for ' +
                          xml_file)
@@ -740,7 +739,7 @@ class temporalBAStack():
 
         # open the mask for the first file in the stack to get ncols and nrows
         # and other associated info for the stack of scenes
-        enviMask = ENVI_Scene (first_file, self.log_handler)
+        enviMask = ENVI_Scene (first_file)
         if enviMask is None:
             logger.error('Error reading the ENVI file: ' + first_file)
             return ERROR
@@ -1105,7 +1104,7 @@ class temporalBAStack():
 
         # open the mask for the first file in the stack to get ncols and nrows
         # and other associated info for the stack of scenes
-        enviMask = ENVI_Scene (first_file, self.log_handler)
+        enviMask = ENVI_Scene (first_file)
         if enviMask is None:
              logger.error('Error reading the ENVI file: ' + first_file)
              return ERROR
@@ -1499,10 +1498,10 @@ class temporalBAStack():
         cmdlist = cmdstr.split(' ')
         try:
             output = subprocess.check_output (cmdlist, stderr=None)
-            logger.info(output, self.log_handler)
+            logger.info(output)
         except subprocess.CalledProcessError, e:
             logger.error('Error running generate_stack. Processing will '
-                        'terminate.\n ' + e.output)
+                         'terminate.\n ' + e.output)
             os.chdir (mydir)
             return ERROR
 
@@ -1514,7 +1513,7 @@ class temporalBAStack():
         cmdlist = cmdstr.split(' ')
         try:
             output = subprocess.check_output (cmdlist, stderr=None)
-            logger.info(output, self.log_handler)
+            logger.info(output)
         except subprocess.CalledProcessError, e:
             logger.error('Error running determine_max_extent. Processing will '
                          'terminate.\n ' + e.output)
@@ -1524,7 +1523,7 @@ class temporalBAStack():
         # resample the files to the maximum bounding extent of the stack
         # and calculate the spectral indices
         if self.delete_src:
-            logger.error('Original source scenes will be deleted after'
+            logger.warn('Original source scenes will be deleted after'
                         ' resampling.')
 
         status = self.resampleStack (bounding_box_file, stack_file)
@@ -1576,7 +1575,7 @@ class temporalBAStack():
 
         # dump out the processing time, convert seconds to hours
         endTime0 = time.time()
-        logger.info('***Total stack processing time = %f hours'
+        logger.info('***Total stack processing time = {0} hours'
                     .format((endTime0 - startTime0) / 3600.0))
 
         logger.info('End time:' +

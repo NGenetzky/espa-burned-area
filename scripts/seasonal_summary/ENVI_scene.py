@@ -39,7 +39,7 @@ class ENVI_Scene:
     # bands
     band1 = None
 
-    def __init__(self, fname, log_handler=None):
+    def __init__(self, fname):
         """Class constructor to open and read metadata of the ENVI file.
         Description: Class constructor verifies the input file exists, then
             opens it, reads the metadata, and establishes pointers to the
@@ -50,7 +50,6 @@ class ENVI_Scene:
 
         Args:
           fname - name of the input ENVI file to be processed
-          log_handler - open log file for logging or None for stdout
 
         Returns:
             None - error opening or reading the file via GDAL

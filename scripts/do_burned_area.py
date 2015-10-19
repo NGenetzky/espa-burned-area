@@ -125,7 +125,7 @@ class BurnedArea():
                 # config directory already
                 if not os.path.exists(config_dir):
                     logger.error('Unable to create config directory: {0}. '
-                                 .format('Exiting ...' % config_dir))
+                                 .format('Exiting ...' + config_dir))
                     return ERROR
 
         temp_file = tempfile.NamedTemporaryFile(mode='w', prefix='temp',
@@ -151,7 +151,7 @@ class BurnedArea():
 
         # run the boosted regression, passing the configuration file
         status = BoostedRegression().runBoostedRegression(  \
-            config_file=config_file, logfile=self.logfile)
+            config_file=config_file)
         if status != SUCCESS:
             logger.error('Error running boosted regression for ' + xml_file)
             return ERROR
@@ -161,10 +161,9 @@ class BurnedArea():
 
         return SUCCESS
 
-
-    def runBurnedArea(self, sr_list_file=None, input_dir=None,  \
-        output_dir=None, model_dir=None, num_processors=1, logfile=None,
-        delete_src=None):
+    def runBurnedArea(self, sr_list_file=None, input_dir=None,
+                      output_dir=None, model_dir=None, num_processors=1,
+                      delete_src=None):
         """Runs the burned area processing from end-to-end for a given
            stack of surface reflectance products.
         Description: Reads the XML list file to determine the path/row and
@@ -208,8 +207,6 @@ class BurnedArea():
               regression algorithm
           num_processors - how many processors should be used for parallel
               processing sections of the application
-          logfile - name of the logfile for logging information; if None then
-              the output will be written to stdout
           delete_src - if set to true then the source scenes will be deleted
               after being resampled to the maximum geographic extents
 
@@ -259,8 +256,6 @@ class BurnedArea():
                 help='how many processors should be used for parallel '  \
                     'processing sections of the application '  \
                     '(default = 1, single threaded)')
-            parser.add_argument ('-l', '--logfile', type=str, dest='logfile',
-                help='name of optional log file', metavar='FILE')
             parser.add_argument ('--delete_src',
                 dest='delete_src', default=False, action='store_true',
                 help='if True, the source files will be deleted after each '
@@ -270,35 +265,34 @@ class BurnedArea():
 
             options = parser.parse_args()
 
+            logger = logging.getLogger(__name__)
             # validate command-line options and arguments
             delete_src = options.delete_src
-            logfile = options.logfile
             sr_list_file = options.sr_list_file
             if sr_list_file is None:
-                parser.error ('missing surface reflectance list file '  \
-                    'cmd-line argument')
+                logger.error('missing surface reflectance list file '
+                             'cmd-line argument')
                 return ERROR
 
             input_dir = options.input_dir
             if input_dir is None:
-                parser.error ('missing input directory cmd-line argument')
+                logger.error('missing input directory cmd-line argument')
                 return ERROR
 
             output_dir = options.output_dir
             if output_dir is None:
-                parser.error ('missing output directory cmd-line argument')
+                logger.error('missing output directory cmd-line argument')
                 return ERROR
 
             model_dir = options.model_dir
             if model_dir is None:
-                parser.error ('missing model directory cmd-line argument')
+                logger.error('missing model directory cmd-line argument')
                 return ERROR
 
             # number of processors
             if options.num_processors is not None:
                 num_processors = options.num_processors
 
-        logger = logging.getLogger(__name__)
 
         # validate options and arguments
         if not os.path.exists(sr_list_file):

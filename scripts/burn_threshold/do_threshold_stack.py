@@ -107,7 +107,7 @@ class BurnAreaThreshold():
 
 
     def writeResults(self, outputData, outputFilename, geotrans, prj, nodata, \
-        outputRAT=None):
+                     outputRAT=None):
         """Writes an array of data to an output file.
         Description: simple function to write an array of data to an output
             image file
@@ -151,7 +151,7 @@ class BurnAreaThreshold():
 
 
     def floodFill(self, input_image, row, col, output_image, output_label=1,
-        local_threshold=75, nodata=-9999):
+                  local_threshold=75, nodata=-9999):
         """Implements the flood fill algorithm for the identified burned areas.
         Description: routine to implement the flood fill of the burned areas
             using the lower threshold test.  Adjacent pixels are added to the
@@ -215,9 +215,7 @@ class BurnAreaThreshold():
         
         
     def findBurnScars(self, bp_image, seed_prob_thresh=97.5,
-        seed_size_thresh=5, flood_fill_prob_thresh=75
-        # , log_handler=None
-        ):
+        seed_size_thresh=5, flood_fill_prob_thresh=75):
         """Identify the seeds for burn scars from the input burn probabilities.
         Description: routine to find burn scars using the flood-fill approach.
           Seed pixels are found by using the seed threshold.  Any pixels with
@@ -253,8 +251,6 @@ class BurnAreaThreshold():
           flood_fill_prob_thresh - threshold to be used to add burn pixels
               from the burn probability image to the burn classification via
               flood filling; default is 75%
-          log_handler - file handler for the log file; if this is None then
-              informational/error messages will be written to stdout
         
         Returns:
           nFill - number of pixels that were flood filled
@@ -304,22 +300,13 @@ class BurnAreaThreshold():
                     local_threshold=flood_fill_prob_thresh, nodata=-9999)
                 
                 if False:
-                    print '#############################################'  \
-                          '###############'
-                    print 'Seed region label:', temp_label
-                    print 'Number of pixels in region:', temp_area
-                    print 'First coordinate:', temp_coords
-                    print 'Filled pixels:', nFilled
-
                     # logger.info('#' * 80) # Creates header bar:############################################################
- 
-                    logger.info('''{0}
+                    logger.debug('''{0}
 Seed region label:{1}
 Number of pixels in region:{2}
 First coordinate:{3}
-Filled pixels:{4}'''
-                                .format('80' * 60, temp_label, temp_area,
-                                        temp_coords, nFilled))
+Filled pixels:{4}'''.format('80' * 60, temp_label, temp_area,
+                            temp_coords, nFilled))
         
         
         # find region properties for the flood filled burn areas
@@ -438,8 +425,8 @@ Filled pixels:{4}'''
         
         # find the final burn scars from the burn probabilities
         bp_scar_results = self.findBurnScars(bp_data, self.seed_prob_thresh,
-            self.seed_size_thresh, self.flood_fill_prob_thresh,
-            self.log_handler)
+                                             self.seed_size_thresh,
+                                             self.flood_fill_prob_thresh)
         bp_scars = bp_scar_results[0]
         bp_scars[ bp_data < 0 ] = bp_data[ bp_data < 0 ]
         bp_rats.append(bp_scar_results[1])
@@ -456,8 +443,7 @@ Filled pixels:{4}'''
 
     def runBurnThreshold(self, stack_file=None, input_dir=None,
         output_dir=None, start_year=None, end_year=None, seed_prob_thresh=97.5,
-        seed_size_thresh=5, flood_fill_prob_thresh=75, num_processors=1,
-        logfile=None):
+        seed_size_thresh=5, flood_fill_prob_thresh=75, num_processors=1)
         """Runs the burn thresholding algorithm to find the burn scars from the
            input burn probabilities.
         Description: routine to find the burn scars using the flood-fill
@@ -504,8 +490,6 @@ Filled pixels:{4}'''
               flood filling; default is 75%
           num_processors - how many processors should be used for parallel
               processing sections of the application
-          logfile - name of the logfile for logging information; if None then
-              the output will be written to stdout
         
         Returns:
             ERROR - error running the burn threshold application
@@ -564,25 +548,23 @@ Filled pixels:{4}'''
                 help='how many processors should be used for parallel '  \
                     'processing sections of the application '  \
                     '(default = 1, single threaded)')
-            parser.add_argument ('-l', '--logfile', type=str, dest='logfile',
-                help='name of optional log file', metavar='FILE')
 
             options = parser.parse_args()
 
             # validate command-line options and arguments
             stack_file = options.stack_file
             if stack_file is None:
-                parser.error ("missing CSV stack file cmd-line argument")
+                logger.error('missing CSV stack file cmd-line argument')
                 return ERROR
 
             input_dir = options.input_dir
             if input_dir is None:
-                parser.error ("missing input directory cmd-line argument")
+                logger.error('missing input directory cmd-line argument')
                 return ERROR
 
             output_dir = options.output_dir
             if output_dir is None:
-                parser.error ("missing output directory cmd-line argument")
+                logger.error('missing output directory cmd-line argument')
                 return ERROR
 
             if options.start_year is not None:
@@ -606,11 +588,6 @@ Filled pixels:{4}'''
         else:
             num_processors = num_processors
 
-        # open the log file if it exists; use line buffering for the output
-        log_handler = None
-        if logfile is not None:
-            log_handler = open (logfile, 'w', buffering=1)
-        self.log_handler = log_handler
         self.seed_prob_thresh = seed_prob_thresh
         self.seed_size_thresh = seed_size_thresh
         self.flood_fill_prob_thresh = flood_fill_prob_thresh
@@ -733,8 +710,6 @@ Filled pixels:{4}'''
         # successful completion.  return to the original directory.
         msg = 'Completion of burn threshold.'
         logger.info(msg)
-        if logfile is not None:
-            log_handler.close()
         os.chdir (mydir)
         return SUCCESS
 

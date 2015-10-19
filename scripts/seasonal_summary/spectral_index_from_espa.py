@@ -47,7 +47,7 @@ class spectralIndex:
     band7 = None
     band_mask = None                # QA mask created from QA bands
 
-    def __init__ (self, band_dict, log_handler=None):
+    def __init__ (self, band_dict):
         """Class constructor which opens the band files.
         Description: spectralIndex class constructor opens the input band
             files and obtains pointers to each of the desired bands.
@@ -63,7 +63,6 @@ class spectralIndex:
         Args:
           band_dict - dictionary of bands to be opened and processed for this
               class
-          log_handler - open log file for logging or None for stdout
         
         Returns:
             None - error opening the file
@@ -178,7 +177,7 @@ class spectralIndex:
         self.dataset_mask = None
 
 
-    def createSpectralIndices (self, index_dict, log_handler=None):
+    def createSpectralIndices (self, index_dict):
         """Generates the specified spectral indices.
         Description: createSpectralIndices creates the desired spectral index
             products.  If mask is specified, then a combined mask file is
@@ -198,13 +197,12 @@ class spectralIndex:
         Args:
           index_dict - dictionary of index types (ndvi, nbr, nbr2, ndmi, mask)
               and the associated filename for the index file
-          log_handler - open log file for logging or None for stdout
         
         Returns:
             ERROR - error generating the spectral indices or mask
             SUCCESS - successful processing
         """
-
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
         num_indices = len(index_dict)
         print '    Processing %d indices: ' % num_indices
         for index in index_dict.keys():

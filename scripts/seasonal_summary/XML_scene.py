@@ -68,7 +68,7 @@ class XML_Scene:
     band_land_water_QA = None
     band_adjacent_cloud_QA = None
 
-    def __init__ (self, xml_file, log_handler=None):
+    def __init__ (self, xml_file):
         """Class constructor.
         Description: class constructor verifies the input file exists, then
             opens it, reads the metadata, and establishes pointers to the
@@ -79,7 +79,6 @@ class XML_Scene:
 
         Args:
           xml_file - name of the input XML reflectance file to be processed
-          log_handler - open log file for logging or None for stdout
         
         Returns:
             None - error opening or reading the file via GDAL
@@ -548,7 +547,7 @@ class XML_Scene:
             'band5':x5, 'band7':x7, 'QA':QA } )
 
 
-    def getBandValues(self, band, log_handler=None):
+    def getBandValues(self, band):
         """Reads the specified band.
         Description: getBandValues reads an entire band of data for the
             specified band.  If it's the QA band, then special processing will
@@ -566,7 +565,6 @@ class XML_Scene:
         Args:
           band - string representing which band to read (band1, band2, band3,
                  band4, band5, band7, band_qa)
-          log_handler - open log file for logging or None for stdout
         
         Returns:
             None - if error occurred trying to read the band or combine the
@@ -622,7 +620,7 @@ class XML_Scene:
             return QA
 
 
-    def createQaBand(self, log_handler=None):
+    def createQaBand(self):
         """Creates a single QA band from the multiple QA bands in the surface
            reflectance file.
         Description: createQaBand will create a single QA band using the various
@@ -635,13 +633,8 @@ class XML_Scene:
               Geographic Science Center
           Updated on 3/18/2014 by Gail Schmidt, USGS/EROS LSRD Project
               Modified to work with the ESPA internal file format.
-        
-        Inputs:
-          log_handler - open log file for logging or None for stdout
-        
         Returns:  N/A
         """
-    
         # create the name of the QA file from the XML filename
         qa_file = self.xml_file.replace ('.xml', '_mask.img')
         self.band_dict['band_qa'] = qa_file
@@ -661,7 +654,7 @@ class XML_Scene:
         # read each surface reflectance QA band, then generate the overall QA
         # band, which is a combination of all the QA values (negative values
         # flag any non-clear pixels and -9999 represents the fill pixels).
-        vals = self.getBandValues ('band_qa', log_handler)
+        vals = self.getBandValues ('band_qa')
         output_band_QA.WriteArray(vals, 0, 0)
 
         # close the datasets so we can copy over the ENVI header file
