@@ -24,8 +24,7 @@ class BoostedRegression():
         pass
 
 
-    def runBoostedRegression (self, config_file=None, logfile=None, \
-        usebin=None):
+    def runBoostedRegression (self, config_file=None, usebin=None):
         """Runs the boosted regression algorithm for the specified file.
         Description: runBoostedRegression will use the parameter passed for
         the input configuration file.  If input config file is None (i.e. not
@@ -44,8 +43,6 @@ class BoostedRegression():
               is deprecated.
         Args:
           config_file - name of the input configuration file to be processed
-          logfile - name of the logfile for logging information; if None then
-              the output will be written to stdout
           usebin - this specifies if the boosted regression tree exe resides
               in the $BIN directory; if None then the boosted regression exe
               is expected to be in the PATH
@@ -74,15 +71,11 @@ class BoostedRegression():
                 action='store_true',
                 help='use BIN environment variable as the location of ' \
                      'boosted regression tree application')
-            parser.add_argument ('-l', '--logfile', type=str,
-                dest='logfile',
-                help='name of optional log file', metavar='FILE')
 
             options = parser.parse_args()
     
             # validate the command-line options
             usebin = options.usebin          # should $BIN directory be used
-            logfile = options.logfile        # name of the log file
 
             # surface reflectance file
             config_file = options.config_file
@@ -91,11 +84,6 @@ class BoostedRegression():
                     'argument');
                 return ERROR
 
-        # open the log file if it exists; use line buffering for the output
-        log_handler = None
-        if logfile is not None:
-            log_handler = open (logfile, 'w', buffering=1)
-        
         # should we expect the boosted regression application to be in the PATH
         # or in the BIN directory?
         if usebin:
@@ -111,7 +99,7 @@ class BoostedRegression():
         # make sure the configuration file exists
         if not os.path.isfile(config_file):
             logger.error('Error: configuration file does not exist or is not '
-                        'accessible: %s'.format(config_file))
+                        'accessible: {0}'.format(config_file))
             return ERROR
 
         # get the path of the config file and change directory to that location
@@ -131,7 +119,7 @@ class BoostedRegression():
                         .format(configdir))
             return ERROR
         logger.info('Changing directories for boosted regression processing:'
-                    ' {a0}'.format(configdir))
+                    ' {0}'.format(configdir))
         os.chdir (configdir)
 
         # run boosted regression algorithm, checking the return status.  exit

@@ -4,7 +4,7 @@ import os
 import re
 import datetime
 from argparse import ArgumentParser
-from log_it import *
+import logging
 
 
 #############################################################################
@@ -27,7 +27,7 @@ class BoostedRegressionConfig():
 
     def runGenerateConfig (self, config_file=None, seasonal_sum_dir=None,
         input_base_file=None, input_mask_file=None, output_dir=None,
-        model_file=None, logfile=None):
+        model_file=None):
         """Generates the configuration file.
         Description: runGenerateConfig will use the input parameters to
         generate the configuration file needed for running the boosted
@@ -56,13 +56,12 @@ class BoostedRegressionConfig():
               surface reflectance file
           output_dir - location of burn probability product to be written
           model_file - name of the geographic model to be used
-          logfile - name of the logfile for logging information; if None then
-              the output will be written to stdout
-       
+
         Returns:
             ERROR - error generating the configuration file
             SUCCESS - successful creation
         """
+        logger = logging.getLogger(__name__)  # Obtain logger for this module.
 
         # if no parameters were passed then get the info from the command line
         if config_file is None:
@@ -91,89 +90,77 @@ class BoostedRegressionConfig():
             parser.add_argument ('-m', '--model_file', type=str,
                 dest='model_file', help='name of the XML model to load',
                 metavar='FILE')
-            parser.add_argument ('-l', '--logfile', type=str, dest='logfile',
-                help='name of optional log file', metavar='FILE')
 
             options = parser.parse_args()
     
             # validate the input info
             if options.config_file is None:
-                parser.error ('missing configuration file command-line ' \
-                    'argument');
+                logger.error('missing configuration file command-line '
+                             'argument');
                 return ERROR
             config_file = options.config_file
 
             if options.seasonal_sum_dir is None:
-                parser.error ('missing seasonal summary directory ' \
-                    'command-line argument');
+                logger.error('missing seasonal summary directory '
+                             'command-line argument');
                 return ERROR
             seasonal_sum_dir = options.seasonal_sum_dir
 
             if options.input_base_file is None:
-                parser.error ('missing the input base image file '  \
-                    'command-line argument');
+                logger.error('missing the input base image file '
+                             'command-line argument');
                 return ERROR
             input_base_file = options.input_base_file
 
             if options.input_mask_file is None:
-                parser.error ('missing the input mask file command-line ' \
-                    'argument');
+                logger.error('missing the input mask file command-line '
+                             'argument');
                 return ERROR
             input_mask_file = options.input_mask_file
 
             if options.output_dir is None:
-                parser.error ('missing the output directory command-line  ' \
-                    'argument');
+                logger.error('missing the output directory command-line  '
+                             'argument');
                 return ERROR
             output_dir = options.output_dir
 
             if options.model_file is None:
-                parser.error ('missing the model file command-line argument');
+                logger.error('missing the model file command-line argument');
                 return ERROR
             model_file = options.model_file
 
-            logfile = options.logfile
-
-        # open the log file if it exists; use line buffering for the output
-        log_handler = None
-        if logfile is not None:
-            log_handler = open (logfile, 'w', buffering=1)
 
         # make sure the seasonal summary directory exists
         if not os.path.exists(seasonal_sum_dir):
-            msg = 'Error: seasonal summary directory does not exist or is ' \
-                'not accessible: %s' % seasonal_sum_dir
-            logIt (msg, log_handler)
+            logger.error('seasonal summary directory does not exist or'
+                        ' is not accessible: {0}'.format(seasonal_sum_dir))
             return ERROR
 
         # make sure the input band 1 image file exists, just as a minor
         # sanity check.  It doesn't guarantee that all the bands will be
         # there though.
         if not os.path.exists(input_base_file + '_sr_band1.img'):
-            msg = 'Error: input base image file does not exist or is not ' \
-                'accessible: %s_sr_band1.img' % input_base_file
-            logIt (msg, log_handler)
+            logger.error('input base image file does not exist or is'
+                         ' not accessible: {0}_sr_band1.img'
+                         .format(input_base_file))
             return ERROR
 
         # make sure the mask file exists
         if not os.path.exists(input_mask_file):
-            msg = 'Error: input mask file does not exist or is not ' \
-                'accessible: %s' % input_mask_file
-            logIt (msg, log_handler)
+            logger.info('input mask file does not exist or is not '
+                'accessible: {0}'.format(input_mask_file))
             return ERROR
 
         # make sure the model file exists
         if not os.path.exists(model_file):
-            msg = 'Error: XML model file does not exist or is not ' \
-                'accessible: %s' % model_file
-            logIt (msg, log_handler)
+            logger.error('XML model file does not exist or is not '
+                        'accessible: {0}'.format(model_file))
             return ERROR
 
         # make sure the output directory exists
         if not os.path.exists(output_dir):
-            msg = 'Error: output directory does not exist or is not ' \
-                'accessible: %s' % output_dir
-            logIt (msg, log_handler)
+            logger.error('output directory does not exist or is not '
+                        'accessible: {0}'.format(output_dir))
             return ERROR
 
         # determine the output filename using the input image filename; split
@@ -186,8 +173,8 @@ class BoostedRegressionConfig():
         # open the configuration file for writing
         config_handler = open (config_file, 'w')
         if config_handler is None:
-            msg = 'Error opening/creating the configuration file for write'
-            logIt (msg, log_handler)
+            logger.error('Error opening/creating the configuration file for'
+                         'write')
             return ERROR
 
         # create the config file
