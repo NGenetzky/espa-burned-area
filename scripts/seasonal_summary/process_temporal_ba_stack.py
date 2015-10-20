@@ -311,7 +311,7 @@ class temporalBAStack():
             ERROR - error excluding the high cloud cover files
             SUCCESS - successful processing
         """
-
+        logger = logging.getLogger(__name__)
         # loop through the HDF files in the input directory
         cc_dir = self.input_dir + 'exclude_cloud_cover/'
         for f_in in sort(os.listdir(self.input_dir)):

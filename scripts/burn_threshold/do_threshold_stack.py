@@ -28,6 +28,7 @@ import os
 import time
 import getopt
 import multiprocessing, Queue
+import logging
 
 import numpy
 import scipy.ndimage
