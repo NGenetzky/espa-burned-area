@@ -159,7 +159,7 @@ class AnnualBurnSummary():
         ds_transform = ds.GetGeoTransform()
         if ds_transform is None:
             logger.error('GDAL failed to get the geographic transform'
-                        'information from {0}'.format(imgfile))
+                         ' information from {0}'.format(imgfile))
             return ERROR
 
         ds_srs = osr.SpatialReference()
@@ -509,24 +509,24 @@ class AnnualBurnSummary():
             # validate command-line options and arguments
             stack_file = options.stack_file
             if stack_file is None:
-                parser.error ("missing CSV stack file cmd-line argument")
+                logger.error('missing CSV stack file cmd-line argument')
                 return ERROR
 
             bp_dir = options.bp_dir
             if input_dir is None:
-                parser.error ("missing input directory for the burn "  \
-                    "probabilities cmd-line argument")
+                logger.error('missing input directory for the burn '
+                             'probabilities cmd-line argument')
                 return ERROR
 
             bc_dir = options.bc_dir
             if input_dir is None:
-                parser.error ("missing input directory for the burn "  \
-                    "classifications cmd-line argument")
+                logger.error('missing input directory for the burn '
+                             'classifications cmd-line argument')
                 return ERROR
 
             output_dir = options.output_dir
             if output_dir is None:
-                parser.error ("missing output directory cmd-line argument")
+                logger.error('missing output directory cmd-line argument')
                 return ERROR
 
             if options.start_year is not None:
@@ -539,19 +539,19 @@ class AnnualBurnSummary():
         if start_year is not None:
             if (start_year < 1984):
                 logger.error('start_year cannot begin before 1984: {0}'
-                            .format(start_year))
+                             .format(start_year))
                 return ERROR
 
         if end_year is not None:
             if (end_year < 1984):
                 logger.error('end_year cannot begin before 1984: {0}'
-                            .format(end_year))
+                             .format(end_year))
                 return ERROR
 
         if (end_year is not None) & (start_year is not None):
             if end_year < start_year:
                 logger.error('end_year ({0}) is less than start_year ({0})'
-                            .format(end_year, start_year))
+                             .format(end_year, start_year))
                 return ERROR
 
         if not os.path.exists(stack_file):
@@ -641,14 +641,14 @@ class AnnualBurnSummary():
         ncol = bp_dataset.RasterXSize
         if (nrow is None) or (ncol is None):
             logger.error('Failed to obtain the RasterXSize and RasterYSize'
-                        ' from ' + bp_file)
+                         ' from ' + bp_file)
             return ERROR
 
         nodata = bp_band.GetNoDataValue()
         if nodata is None:
             nodata = -9999
             logger.error('Failed to obtain the NoDataValue from {0}.'
-                         ' Using {1}'.format(bp_file, nodata))
+                         '  Using {1}'.format(bp_file, nodata))
 
         # close the file
         bp_band = None
@@ -706,7 +706,7 @@ class AnnualBurnSummary():
                 bc_name = bc_dir + '/' + fname
                 if not os.path.exists(bc_name):
                     logger.error('burn classification file does not exist: ' +
-                                bc_name)
+                                 bc_name)
                     os.chdir (mydir)
                     return ERROR
 

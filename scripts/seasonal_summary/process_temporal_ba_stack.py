@@ -282,7 +282,7 @@ class temporalBAStack():
                     # create the RMSE exclude directory if it doesn't exist
                     if not os.path.exists(rmse_dir):
                         logger.info('RMSE exclude directory does not exist:'
-                                    ' {}. Creating ...'.format(rmse_dir))
+                                    ' {0}. Creating ...'.format(rmse_dir))
                         os.makedirs(rmse_dir, 0755)
 
                     # move the scene files to the exclude subdirectory
@@ -337,7 +337,7 @@ class temporalBAStack():
                     # create cloud cover exclude directory if it doesn't exist
                     if not os.path.exists(cc_dir):
                         logger.info('Cloud cover exclude directory does not'
-                                    ' exist: {}.  Creating ...'
+                                    ' exist: {0}.  Creating ...'
                                     .format(cc_dir))
                         os.makedirs(cc_dir, 0755)
 
@@ -727,8 +727,8 @@ class temporalBAStack():
         years = unique (self.csv_data['year'])
         start_year = years[0]
         end_year = years[len(years)-1]
-        logger.info('\nProcessing stack for {} - {}'.format(start_year,
-                                                            end_year))
+        logger.info('\nProcessing stack for {0} - {1}'.format(start_year,
+                                                              end_year))
 
         # determine band1 file for the first scene listed in the stack
         first_file = self.csv_data['file_'][0]

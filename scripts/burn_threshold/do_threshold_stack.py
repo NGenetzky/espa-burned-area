@@ -301,7 +301,6 @@ class BurnAreaThreshold():
                     local_threshold=flood_fill_prob_thresh, nodata=-9999)
                 
                 if False:
-                    # logger.info('#' * 80) # Creates header bar:############################################################
                     logger.debug('''{0}
 Seed region label:{1}
 Number of pixels in region:{2}

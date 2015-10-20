@@ -80,8 +80,8 @@ class BoostedRegression():
             # surface reflectance file
             config_file = options.config_file
             if config_file is None:
-                parser.error ('missing configuration file command-line ' \
-                    'argument');
+                logger.error('missing configuration file command-line '
+                             'argument')
                 return ERROR
 
         # should we expect the boosted regression application to be in the PATH
@@ -95,11 +95,11 @@ class BoostedRegression():
             # don't use a path to the boosted regression application
             bin_dir = ""
             logger.info('boosted regression executable expected to be in the PATH')
-        
+
         # make sure the configuration file exists
         if not os.path.isfile(config_file):
-            logger.error('Error: configuration file does not exist or is not '
-                        'accessible: {0}'.format(config_file))
+            logger.error('configuration file does not exist or is not'
+                        ' accessible: {0}'.format(config_file))
             return ERROR
 
         # get the path of the config file and change directory to that location
@@ -111,12 +111,11 @@ class BoostedRegression():
         mydir = os.getcwd()
         configdir = os.path.dirname (os.path.abspath (config_file))
         if not os.access(configdir, os.W_OK):
-            # Could be made more pep8 compliant
-            logger.error('Path of configuration file is not writable: {0}.  Boosted '
-                        'regression may need write access to the configuration '
-                        'directory, depending on whether the output files in the '
-                        'configuration file have been specified.'
-                        .format(configdir))
+            logger.error('Path of configuration file is not writable: {0}.'
+                         '  Boosted regression may need write access to the'
+                         ' configuration directory, depending on whether the'
+                         ' output files in the configuration file have been'
+                         ' specified.'.format(configdir))
             return ERROR
         logger.info('Changing directories for boosted regression processing:'
                     ' {0}'.format(configdir))
@@ -132,7 +131,7 @@ class BoostedRegression():
             logger.info(output)
         except subprocess.CalledProcessError, e:
             logger.error('Error running boosted regression. Processing will '
-                        'terminate.\n ' + e.output)
+                         'terminate.\n ' + e.output)
             os.chdir (mydir)
             return ERROR
 

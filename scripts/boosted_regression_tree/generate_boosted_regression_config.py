@@ -174,7 +174,7 @@ class BoostedRegressionConfig():
         config_handler = open (config_file, 'w')
         if config_handler is None:
             logger.error('Error opening/creating the configuration file for'
-                         'write')
+                         ' write')
             return ERROR
 
         # create the config file
