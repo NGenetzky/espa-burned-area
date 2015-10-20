@@ -647,8 +647,8 @@ class AnnualBurnSummary():
         nodata = bp_band.GetNoDataValue()
         if nodata is None:
             nodata = -9999
-            logger.error('Failed to obtain the NoDataValue from {0}.  Using {1}
-                        '.format(bp_file, nodata))
+            logger.error('Failed to obtain the NoDataValue from {0}.'
+                         ' Using {1}'.format(bp_file, nodata))
 
         # close the file
         bp_band = None

@@ -441,10 +441,10 @@ Filled pixels:{4}'''.format('80' * 60, temp_label, temp_area,
 
         return SUCCESS
 
-
     def runBurnThreshold(self, stack_file=None, input_dir=None,
-        output_dir=None, start_year=None, end_year=None, seed_prob_thresh=97.5,
-        seed_size_thresh=5, flood_fill_prob_thresh=75, num_processors=1)
+                         output_dir=None, start_year=None, end_year=None,
+                         seed_prob_thresh=97.5, seed_size_thresh=5,
+                         flood_fill_prob_thresh=75, num_processors=1):
         """Runs the burn thresholding algorithm to find the burn scars from the
            input burn probabilities.
         Description: routine to find the burn scars using the flood-fill

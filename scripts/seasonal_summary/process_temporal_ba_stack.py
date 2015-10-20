@@ -20,7 +20,6 @@ from XML_scene import *
 from ENVI_scene import *
 from spectral_indices import *
 from spectral_index_from_espa import *
-from log_it import *
 from parallel_worker import *
 
 NUM_SR_BANDS = 13
@@ -1308,9 +1307,9 @@ class temporalBAStack():
         return SUCCESS
 
 
-    def processStack (self, input_dir=None, exclude_l1g=None,  \
-        exclude_rmse=None, exclude_cloud_cover=None, logfile=None,  \
-        num_processors=1, delete_src=None):
+    def processStack (self, input_dir=None, exclude_l1g=None,
+                      exclude_rmse=None, exclude_cloud_cover=None,
+                      num_processors=1, delete_src=None):
         """Processes the temporal stack of data to generate seasonal summaries
            and annual maximums for each year in the stack.
         Description: processStack will process the temporal stack of data
@@ -1350,8 +1349,6 @@ class temporalBAStack():
           exclude_cloud_cover - if True, then the high cloud cover scenes are
               excluded from the processing stack.  These files are also moved
               to a directory called exclude_cloud_cover in the input directory.
-          logfile - name of the logfile for logging information; if None then
-              the output will be written to stdout
           num_processors - how many processors should be used for parallel
               processing sections of the application
           delete_src - if set to true then the source scenes will be deleted
@@ -1387,8 +1384,6 @@ class temporalBAStack():
                     'of data resides and where the data will be processed '
                     '(i.e. need read and write permissions to this '
                     'directory)', metavar='DIR')
-            parser.add_argument ('-l', '--logfile', type=str, dest='logfile',
-                help='name of optional log file', metavar='FILE')
             parser.add_argument ('-p', '--num_processors', type=int,
                 dest='num_processors',
                 help='how many processors should be used for parallel '
@@ -1421,8 +1416,6 @@ class temporalBAStack():
 
             options = parser.parse_args()
     
-            # validate the command-line options
-            logfile = options.logfile
             exclude_l1g = options.exclude_l1g
             exclude_rmse = options.exclude_rmse
             exclude_cloud_cover = options.exclude_cloud_cover
@@ -1579,7 +1572,7 @@ class temporalBAStack():
                     .format((endTime0 - startTime0) / 3600.0))
 
         logger.info('End time:' +
-                    str(datetime.datetime.now().strftime("%b %d %Y %H:%M:%S"))
+                    str(datetime.datetime.now().strftime('%b %d %Y %H:%M:%S')))
         return SUCCESS
 
 ######end of temporalBAStack class######
