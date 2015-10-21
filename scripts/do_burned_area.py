@@ -16,7 +16,6 @@ from generate_boosted_regression_config import BoostedRegressionConfig
 from do_boosted_regression import BoostedRegression
 from do_threshold_stack import BurnAreaThreshold
 from do_annual_burn_summaries import AnnualBurnSummary
-from do_spectral_indices import SpectralIndices
 
 ERROR = 1
 SUCCESS = 0

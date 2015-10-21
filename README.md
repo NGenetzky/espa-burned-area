@@ -56,15 +56,15 @@ Same scripts as for Version 1.0.0, updated for 1.1.0.  Added a script called do\
 ### Verification Data
 
 ### User Manual
-There are currently two applications associated with the burned area ECV.  The first application is the seasonal summaries, which generates the seasonal summaries and annual maximums for an input temporal stack of scenes for a given path/row.  The application determines the maximum geographic extents for the given stack, resamples each scene to this maximum geographic extent, then generates seasonal summaries for the reflective bands and index products (NBR, NBR2, NDVI, NDMI) along with a mask for the seasons and year.  This application also generates annual maximums for the index products.  (See the usage information via `process_temporal_ba_stack.py --help`.)
+There are currently three applications associated with the burned area ECV.  The first application is the seasonal summaries, which generates the seasonal summaries and annual maximums for an input temporal stack of scenes for a given path/row.  This application determines the maximum geographic extents for the given stack, resamples each scene to this maximum geographic extent, then generates seasonal summaries for the reflective bands and index products (NBR, NBR2, NDVI, NDMI) along with a mask for the seasons and year.  This application also generates annual maximums for the index products.  (See the usage information via `process_temporal_ba_stack.py --help`.)
 
 The second application is a scene-based probability mapping using a gradient boosting tree to predict the probability that any pixel is burned.  This application relies on the seasonal summaries and annual maximums generated in the previous step.  The appliction will create a single band product for the scene containing the burn probabilities.  (See the usage information via `do_boosted_regression.py --help`.)
 
 The boosted regression code allows a model to be trained and saved so that it can be loaded later for model predictions.  The training and prediction can also occur during the same run, depending on the input parameters provided in the parameter file.  In order to run model predictions for any scene, the model must first have been trained and then loaded.
 
-The burn\_threshold application filters the probability mappings as a final step in determining the burned pixels.    (See the usage information via `process_temporal_ba_stack.py --help`.)
+The burn\_threshold application filters the probability mappings as the third and final step in determining the burned pixels.  This is a two-part process where the thresholds are applied and then the overall annual burn summaries are generated.  (See the usage information via `do_threshold_stack.py --help` and `do_annual_burn_summaries.py --help`.)
 
-The do\_burned\_area.py script runs the overall end-to-end processing given a stack of ESPA surface reflectance products in the ESPA raw binary format with associated XML files.  (See the usage information via `do_burned_area.py --help`.)
+The do\_burned\_area.py script runs the overall end-to-end processing given a stack of ESPA surface reflectance products in the ESPA raw binary format with associated XML files.  Thus each of the above applications are set up and invoked via this one overarching script.  (See the usage information via `do_burned_area.py --help`.)
 
 ### Product Guide
 
