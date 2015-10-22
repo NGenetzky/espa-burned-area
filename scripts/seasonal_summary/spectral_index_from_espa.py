@@ -10,6 +10,10 @@ from osgeo import gdalconst
 from spectral_indices import *
 import logging
 
+### Error/Success codes ###
+ERROR = 1
+SUCCESS = 0
+
 #############################################################################
 # Created on May 1, 2013 by Gail Schmidt, USGS/EROS
 # Created class to hold the methods and attributes for reading the ESPA

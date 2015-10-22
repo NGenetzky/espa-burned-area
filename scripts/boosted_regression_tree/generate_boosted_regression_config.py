@@ -6,6 +6,9 @@ import datetime
 from argparse import ArgumentParser
 import logging
 
+### Error/Success codes ###
+ERROR = 1
+SUCCESS = 0
 
 #############################################################################
 # Created on September 25, 2013 by Gail Schmidt, USGS/EROS
@@ -198,4 +201,12 @@ class BoostedRegressionConfig():
 ######end of BoostedRegressionConfig class######
 
 if __name__ == "__main__":
+    # setup the default logger format and level. log to STDOUT.
+    logging.basicConfig(format=('%(asctime)s.%(msecs)03d %(process)d'
+                                ' %(levelname)-8s'
+                                ' %(filename)s:%(lineno)d:'
+                                '%(funcName)s -- %(message)s'),
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.INFO)
+
     sys.exit (BoostedRegressionConfig().runGenerateConfig())

@@ -516,4 +516,12 @@ class BurnedArea():
 ######end of BurnedArea class######
 
 if __name__ == "__main__":
+    # setup the default logger format and level. log to STDOUT.
+    logging.basicConfig(format=('%(asctime)s.%(msecs)03d %(process)d'
+                                ' %(levelname)-8s'
+                                ' %(filename)s:%(lineno)d:'
+                                '%(funcName)s -- %(message)s'),
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.INFO)
+
     sys.exit (BurnedArea().runBurnedArea())

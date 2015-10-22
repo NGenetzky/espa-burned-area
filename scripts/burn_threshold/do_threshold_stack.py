@@ -41,6 +41,7 @@ from osgeo import osr
 from osgeo import gdal_array
 from osgeo import gdalconst
 
+### Error/Success codes ###
 ERROR = 1
 SUCCESS = 0
 
@@ -716,4 +717,12 @@ Filled pixels:{4}'''.format('80' * 60, temp_label, temp_area,
 ######end of BurnAreaThreshold class######
 
 if __name__ == "__main__":
+    # setup the default logger format and level. log to STDOUT.
+    logging.basicConfig(format=('%(asctime)s.%(msecs)03d %(process)d'
+                                ' %(levelname)-8s'
+                                ' %(filename)s:%(lineno)d:'
+                                '%(funcName)s -- %(message)s'),
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.INFO)
+
     sys.exit (BurnAreaThreshold().runBurnThreshold())

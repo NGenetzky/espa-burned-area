@@ -22,6 +22,10 @@ from spectral_indices import *
 from spectral_index_from_espa import *
 from parallel_worker import *
 
+### Error/Success codes ###
+ERROR = 1
+SUCCESS = 0
+
 NUM_SR_BANDS = 13
 
 #############################################################################
@@ -1578,4 +1582,12 @@ class temporalBAStack():
 ######end of temporalBAStack class######
 
 if __name__ == "__main__":
+    # setup the default logger format and level. log to STDOUT.
+    logging.basicConfig(format=('%(asctime)s.%(msecs)03d %(process)d'
+                                ' %(levelname)-8s'
+                                ' %(filename)s:%(lineno)d:'
+                                '%(funcName)s -- %(message)s'),
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.INFO)
+
     sys.exit (temporalBAStack().processStack())

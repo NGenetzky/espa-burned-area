@@ -3,6 +3,10 @@ import multiprocessing, Queue
 import time
 import logging
 
+### Error/Success codes ###
+ERROR = 1
+SUCCESS = 0
+
 #if temporalBAStack is already imported from a higher level script, then
 #this import is not needed
 #from process_temporal_ba_stack import temporalBAStack
