@@ -261,10 +261,26 @@ class BurnedArea():
                      'scene has been resampled to the maximum geographic '
                      'extents. The MTL and XML file will remain for downstream '
                      'processing.')
-
+            parser.add_argument('-l', '--logfile', type=str, dest='logfile',
+                                metavar='FILE', default='burned_area.log',
+                                help='name of optional log file')
             options = parser.parse_args()
 
-            logger = logging.getLogger(__name__)
+            # Setup the logging class's root logger.
+            root = logging.getLogger()  # Obtain "super class"/root logger
+
+            # Create file handler to send log messages to.
+            fh = logging.FileHandler(options.logfile, 'w')
+            fh.setLevel(logging.INFO)
+            # create console handler to send log messages to the console.
+            ch = logging.StreamHandler()
+            ch.setLevel(logging.ERROR)
+
+            root.addHandler(ch)  # add the handlers to root logger
+            root.addHandler(fh)  # add the handlers to root logger 
+
+            logger = logging.getLogger(__name__)  # Obtain logger for this module.
+
             # validate command-line options and arguments
             delete_src = options.delete_src
             sr_list_file = options.sr_list_file

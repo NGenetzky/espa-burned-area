@@ -620,7 +620,7 @@ class temporalBAStack():
                 self.spatial_extent['East'], self.spatial_extent['South'],  \
                 xmlAttr.band_dict[i])
             logger.info('    ' + cmd)
-            os.system(cmd)
+            os.system(cmd + ' >& /dev/null')  # Supresses output.
 
         # if specified then remove the original scene data after succesfully
         # resampling the needed bands.  leave the MTL and XML file for
