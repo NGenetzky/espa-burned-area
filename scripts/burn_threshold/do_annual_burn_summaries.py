@@ -305,7 +305,7 @@ class AnnualBurnSummary():
 
         # how many bands are there in the new XML file
         num_scene_bands =  len (meta_bands.band)
-        print "New XML file has %d bands" % num_scene_bands
+        logger.info('New XML file has {0} bands'.format(num_scene_bands))
 
         # loop through the products and years to create the band metadata
         band_count = 0
@@ -821,28 +821,28 @@ class AnnualBurnSummary():
         # won't be delivered to the user
         rm_files = glob.glob (output_dir + '/burned_area_*.img.aux.xml')
         for file in rm_files:
-            print 'Remove: ' + file
+            logger.info('Remove: ' + file))
             os.remove (os.path.join (file))
 
         rm_files = glob.glob (output_dir + '/burn_count_*.img.aux.xml')
         for file in rm_files:
-            print 'Remove: ' + file
+            logger.info('Remove: ' + file)
             os.remove (os.path.join (file))
 
         rm_files = glob.glob (output_dir + '/good_looks_count_*.img.aux.xml')
         for file in rm_files:
-            print 'Remove: ' + file
+            logger.info('Remove: ' + file)
             os.remove (os.path.join (file))
 
         rm_files = glob.glob (output_dir + '/max_burn_prob_*.img.aux.xml')
         for file in rm_files:
-            print 'Remove: ' + file
+            logger.info('Remove: ' + file)
             os.remove (os.path.join (file))
 
         # create the output XML file which contains information for each of
         # the bands: burned area date, burn count, good looks count, and the
         # maximum burn probability
-        print "Creating output XML file for burned area ..."
+        logger.info('Creating output XML file for burned area ...')
         xml_file = stack2['file_'][0]
         fname = os.path.basename(xml_file).replace  \
             ('.xml','_burn_probability.img')

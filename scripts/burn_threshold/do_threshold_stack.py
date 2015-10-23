@@ -320,7 +320,7 @@ Filled pixels:{4}'''.format('80' * 60, temp_label, temp_area,
             label_image=bp_regions2, intensity_image=bp_image)
         
         # define the RAT (raster attribute table)
-        #print 'Creating raster attribute table...'
+        #logger.debug('Creating raster attribute table...')
         label_rat = gdal.RasterAttributeTable()
         label_rat.CreateColumn("Value", gdalconst.GFT_Integer,  \
             gdalconst.GFU_MinMax)
@@ -333,7 +333,7 @@ Filled pixels:{4}'''.format('80' * 60, temp_label, temp_area,
         label_rat.SetRowCount(n_labels)
         
         # set values in the RAT
-        #print 'Populating raster attribute table...'
+        #logger.debug('Populating raster attribute table...')
         for i in range(0, n_labels):
             # label id
             label_rat.SetValueAsInt(i, 0, bp_region2_props[i]['label'])
@@ -683,7 +683,7 @@ Filled pixels:{4}'''.format('80' * 60, temp_label, temp_area,
                 return ERROR
 
             # add this file to the queue to be processed
-            print 'Pushing on the queue ... ' + bp_file_name
+            logger.info('Pushing on the queue ... ' + bp_file_name)
             work_queue.put(bp_file_name)
 
         # create a queue to pass to workers to store the processing status

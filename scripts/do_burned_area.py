@@ -266,18 +266,10 @@ class BurnedArea():
                                 help='name of optional log file')
             options = parser.parse_args()
 
-            # Setup the logging class's root logger.
-            root = logging.getLogger()  # Obtain "super class"/root logger
-
-            # Create file handler to send log messages to.
-            fh = logging.FileHandler(options.logfile, 'w')
-            fh.setLevel(logging.INFO)
-            # create console handler to send log messages to the console.
-            ch = logging.StreamHandler()
-            ch.setLevel(logging.ERROR)
-
-            root.addHandler(ch)  # add the handlers to root logger
-            root.addHandler(fh)  # add the handlers to root logger 
+            # Setup root logger. Future logger modules inherit these settings.
+            setup_root_logger(logfile=options.logfile,
+                              file_loglevel=logging.INFO,
+                              console_loglevel=logging.INFO)
 
             logger = logging.getLogger(__name__)  # Obtain logger for this module.
 
@@ -463,7 +455,7 @@ class BurnedArea():
                 continue
 
             # add this file to the queue to be processed
-            print 'Pushing on the queue ... ' + xml_file
+            logger.info('Pushing on the queue ... ' + xml_file)
             work_queue.put(xml_file)
             num_boosted_scenes += 1
 
@@ -530,6 +522,52 @@ class BurnedArea():
         return SUCCESS
 
 ######end of BurnedArea class######
+
+def setup_root_logger(logfile, file_loglevel=logging.INFO,
+                      console_loglevel=logging.INFO):
+    '''Setup settings that are inherited by all logger modules
+
+    Description: The root logger will be setup to log to both the console and
+        to a file. The file should be specifed as a parameter. The level of
+        logging will be set to INFO by default.
+
+    Precondition:
+        logfile must be a valid filepath in a directory where the file can be
+        created or written to.
+
+    Postcondition:
+        All messages that are higher than "file_loglevel" will be written to
+            the file specified by "logfile".
+        All messages that are higher than "console_loglevel" will be written
+            to the console.
+        If "logfile" exists:
+            Contents of "logfile" will be erased/overwritten with new messages.
+        else if logfile does not exist:
+            "logfile" will be created.
+    '''
+    format = ('%(asctime)s.%(msecs)03d %(process)d'
+              ' %(levelname)-8s %(filename)s:%(lineno)d:'
+              '%(funcName)s -- %(message)s')
+    datefmt = '%Y-%m-%d %H:%M:%S'
+
+    # Setup the logging class's root logger.
+    root = logging.getLogger()  # Obtain "super class"/root logger
+    root.setLevel(logging.NOTSET)  # NOTSET means all messages are proccessed.
+
+    # Create file handler to send log messages to.
+    # 'w' indicates contents will be overwritten.
+    fh = logging.FileHandler(logfile, 'w+')
+    fh.setLevel(file_loglevel)
+    fh.setFormatter(logging.Formatter(fmt=format, datefmt=datefmt))
+
+    # create console handler to send log messages to the console.
+    ch = logging.StreamHandler()
+    ch.setLevel(console_loglevel)
+    ch.setFormatter(logging.Formatter(fmt=format, datefmt=datefmt))
+
+    root.addHandler(ch)  # add the handlers to root logger
+    root.addHandler(fh)  # add the handlers to root logger
+
 
 if __name__ == "__main__":
     # setup the default logger format and level. log to STDOUT.

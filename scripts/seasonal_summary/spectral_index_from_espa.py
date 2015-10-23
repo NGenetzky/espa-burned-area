@@ -208,10 +208,10 @@ class spectralIndex:
         """
         logger = logging.getLogger(__name__)  # Obtain logger for this module.
         num_indices = len(index_dict)
-        print '    Processing %d indices: ' % num_indices
+        logger.info('    Processing %d indices: '.format(num_indices))
         for index in index_dict.keys():
-            print '      ' + index
-    
+            logger.info('      ' + index)
+
         # ignore divide by zero and invalid (NaN) values when doing array
         # division.  these will be handled on our own.
         seterr(divide='ignore', invalid='ignore')
