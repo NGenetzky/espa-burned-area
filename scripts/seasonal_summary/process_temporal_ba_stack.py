@@ -1428,7 +1428,7 @@ class temporalBAStack():
             # input directory
             input_dir = options.input_dir
             if input_dir is None:
-                parser.error("missing input directory command-line argument")
+                parser.error('missing input directory command-line argument')
                 return ERROR
 
             # number of processors

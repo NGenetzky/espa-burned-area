@@ -99,36 +99,36 @@ class BoostedRegressionConfig():
             # validate the input info
             if options.config_file is None:
                 logger.error('missing configuration file command-line '
-                             'argument');
+                             'argument')
                 return ERROR
             config_file = options.config_file
 
             if options.seasonal_sum_dir is None:
                 logger.error('missing seasonal summary directory '
-                             'command-line argument');
+                             'command-line argument')
                 return ERROR
             seasonal_sum_dir = options.seasonal_sum_dir
 
             if options.input_base_file is None:
                 logger.error('missing the input base image file '
-                             'command-line argument');
+                             'command-line argument')
                 return ERROR
             input_base_file = options.input_base_file
 
             if options.input_mask_file is None:
                 logger.error('missing the input mask file command-line '
-                             'argument');
+                             'argument')
                 return ERROR
             input_mask_file = options.input_mask_file
 
             if options.output_dir is None:
                 logger.error('missing the output directory command-line  '
-                             'argument');
+                             'argument')
                 return ERROR
             output_dir = options.output_dir
 
             if options.model_file is None:
-                logger.error('missing the model file command-line argument');
+                logger.error('missing the model file command-line argument')
                 return ERROR
             model_file = options.model_file
 
@@ -136,7 +136,7 @@ class BoostedRegressionConfig():
         # make sure the seasonal summary directory exists
         if not os.path.exists(seasonal_sum_dir):
             logger.error('seasonal summary directory does not exist or'
-                        ' is not accessible: {0}'.format(seasonal_sum_dir))
+                         ' is not accessible: {0}'.format(seasonal_sum_dir))
             return ERROR
 
         # make sure the input band 1 image file exists, just as a minor
@@ -151,19 +151,19 @@ class BoostedRegressionConfig():
         # make sure the mask file exists
         if not os.path.exists(input_mask_file):
             logger.info('input mask file does not exist or is not '
-                'accessible: {0}'.format(input_mask_file))
+                        'accessible: {0}'.format(input_mask_file))
             return ERROR
 
         # make sure the model file exists
         if not os.path.exists(model_file):
             logger.error('XML model file does not exist or is not '
-                        'accessible: {0}'.format(model_file))
+                         'accessible: {0}'.format(model_file))
             return ERROR
 
         # make sure the output directory exists
         if not os.path.exists(output_dir):
             logger.error('output directory does not exist or is not '
-                        'accessible: {0}'.format(output_dir))
+                         'accessible: {0}'.format(output_dir))
             return ERROR
 
         # determine the output filename using the input image filename; split

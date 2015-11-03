@@ -148,7 +148,7 @@ class AnnualBurnSummary():
         ds_band = ds.GetRasterBand (1)
         if ds_band is None:
             logger.error('GDAL failed to get the first band in {0}'
-                        .format(imgfile))
+                         .format(imgfile))
             return ERROR
         nlines = float(ds_band.YSize)
         nsamps = float(ds_band.XSize)
@@ -165,7 +165,7 @@ class AnnualBurnSummary():
         ds_srs = osr.SpatialReference()
         if ds_srs is None:
             logger.error('GDAL failed to get the spatial reference information'
-                        ' from {0}'.format(imgfile))
+                         ' from {0}'.format(imgfile))
             return ERROR
         ds_srs.ImportFromWkt (ds.GetProjection())
         del (ds)
@@ -414,7 +414,7 @@ class AnnualBurnSummary():
         fd = open (output_xml_file, 'w')
         if fd == None:
             logger.error('Unable to open the output XML file ({0}) for writing.'
-                        .format(output_xml_file))
+                         .format(output_xml_file))
             return ERROR
 
         metadata_api.export (fd, xml)
@@ -560,17 +560,17 @@ class AnnualBurnSummary():
 
         if not os.path.exists(bp_dir):
             logger.error('Burn probability directory does not exist: ' +
-                        bp_dir)
+                         bp_dir)
             return ERROR
-    
+
         if not os.path.exists(bc_dir):
             logger.error('Burn classificaton directory does not exist: ' +
-                        bc_dir)
+                         bc_dir)
             return ERROR
-    
+
         if not os.path.exists(output_dir):
             logger.error('Output directory does not exist: {0}. Creating ...'
-                        .format(output_dir))
+                         .format(output_dir))
             os.makedirs(output_dir, 0755)
 
         # save the current working directory for return to upon error or when
@@ -582,7 +582,7 @@ class AnnualBurnSummary():
 
         # start of threshold processing
         start_time0 = time.time()
-    
+
         # open the stack file
         stack = numpy.recfromcsv(stack_file, delimiter=',', names=True)
 
@@ -634,7 +634,7 @@ class AnnualBurnSummary():
         prj = bp_dataset.GetProjectionRef()
         if prj is None:
             logger.error('Failed to obtain the ProjectionRef info from ' +
-                        bp_file)
+                         bp_file)
             return ERROR
 
         nrow = bp_dataset.RasterYSize
@@ -668,7 +668,7 @@ class AnnualBurnSummary():
         logger.info('Processing burn files for {0}-{1}'.format(start_year,
                                                                end_year))
         for year in range(start_year, end_year+1):
-            logger.info('#' * 56)
+            logger.info('########################################################')
             logger.info('Processing {0} ...'.format(year))
 
             stack_mask = stack2['year'] == year
@@ -693,7 +693,7 @@ class AnnualBurnSummary():
                 bp_file = bp_dir + '/' + fname
                 if not os.path.exists(bp_file):
                     logger.error('burn probability file does not exist: ' +
-                                bp_file)
+                                 bp_file)
                     os.chdir (mydir)
                     return ERROR
 

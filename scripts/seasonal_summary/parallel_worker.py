@@ -41,7 +41,7 @@ class parallelSceneWorker(multiprocessing.Process):
             status = self.stackObject.sceneResample (xml_file)
             if status != SUCCESS:
                 logger.error('Error resampling the surface reflectance bands '
-                             'in the XML file ({0}). Processing will terminate'
+                             'in the XML file ({0}). Processing will terminate.'
                              .format(xml_file))
  
             # store the result

@@ -555,7 +555,7 @@ def setup_root_logger(logfile, file_loglevel=logging.INFO,
     root.setLevel(logging.NOTSET)  # NOTSET means all messages are proccessed.
 
     # Create file handler to send log messages to.
-    # 'w' indicates contents will be overwritten.
+    # 'w', contents will be overwritten.'+', will create if not exist.
     fh = logging.FileHandler(logfile, 'w+')
     fh.setLevel(file_loglevel)
     fh.setFormatter(logging.Formatter(fmt=format, datefmt=datefmt))

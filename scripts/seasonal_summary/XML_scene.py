@@ -574,8 +574,8 @@ class XML_Scene:
         logger = logging.getLogger(__name__)  # Obtain logger for this module.
         if not (band in ['band1', 'band2', 'band3', 'band4', 'band5', \
             'band7', 'band_qa']):
-            logger.error('Band {0} is not supported. Needs to be one of '
-                         'band1, band2, band3, band4, band5, band7,'
+            logger.error('Band {0} is not supported. Needs to be one of'
+                         ' band1, band2, band3, band4, band5, band7,'
                          ' or band_qa.'.format(band))
             return None
 
