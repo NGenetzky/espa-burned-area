@@ -56,6 +56,7 @@ class ENVI_Scene:
             Object - successful processing
         """
         logger = logging.getLogger(__name__)
+
         # make sure the file exists
         if not os.path.exists(fname):
             logger.error('Input file does not exist: ' + fname)

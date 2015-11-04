@@ -569,8 +569,8 @@ class AnnualBurnSummary():
             return ERROR
 
         if not os.path.exists(output_dir):
-            logger.error('Output directory does not exist: {0}. Creating ...'
-                         .format(output_dir))
+            logger.info('Output directory does not exist: {0}. Creating ...'
+                        .format(output_dir))
             os.makedirs(output_dir, 0755)
 
         # save the current working directory for return to upon error or when

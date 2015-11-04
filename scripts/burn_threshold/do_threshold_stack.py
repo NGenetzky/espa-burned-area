@@ -300,16 +300,16 @@ class BurnAreaThreshold():
                 nFilled = self.floodFill(input_image=bp_image, row=row,  \
                     col=col, output_image=bp_regions, output_label=temp_label, \
                     local_threshold=flood_fill_prob_thresh, nodata=-9999)
-                
+
                 if False:
                     logger.debug('''{0}
 Seed region label:{1}
 Number of pixels in region:{2}
 First coordinate:{3}
-Filled pixels:{4}'''.format('80' * 60, temp_label, temp_area,
+Filled pixels:{4}'''.format('#' * 60, temp_label, temp_area,
                             temp_coords, nFilled))
-        
-        
+
+
         # find region properties for the flood filled burn areas
         bc2 = bp_regions > 0
         bp_regions2 = numpy.zeros_like(bc2, dtype=numpy.int32)

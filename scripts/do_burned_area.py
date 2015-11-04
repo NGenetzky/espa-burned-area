@@ -106,6 +106,7 @@ class BurnedArea():
             SUCCESS - successful processing
         """
         logger = logging.getLogger(__name__)
+
         # split the xml file into directory and base name
         dir_name = os.path.dirname(xml_file)
         base_name = os.path.basename(xml_file)
@@ -123,8 +124,8 @@ class BurnedArea():
                 # recheck just in case there is another thread that made the
                 # config directory already
                 if not os.path.exists(config_dir):
-                    logger.error('Unable to create config directory: {0}. '
-                                 .format('Exiting ...' + config_dir))
+                    logger.error('Unable to create config directory:'
+                                 ' Exiting ...{0}. '.format(config_dir))
                     return ERROR
 
         temp_file = tempfile.NamedTemporaryFile(mode='w', prefix='temp',
@@ -149,10 +150,11 @@ class BurnedArea():
             return ERROR
 
         # run the boosted regression, passing the configuration file
-        status = BoostedRegression().runBoostedRegression(  \
+        status = BoostedRegression().runBoostedRegression(
             config_file=config_file)
         if status != SUCCESS:
-            logger.error('Error running boosted regression for ' + xml_file)
+            logger.error('Error running boosted regression for '
+                         .format(xml_file))
             return ERROR
 
         # clean up the temporary configuration file
@@ -308,7 +310,7 @@ class BurnedArea():
             return ERROR
 
         if not os.path.exists(input_dir):
-            logger.error('Input directory does not exist: ' + input_dir)
+            logger.error('Input directory does not exist: '.format(input_dir))
             return ERROR
 
         if not os.path.exists(output_dir):
@@ -317,7 +319,7 @@ class BurnedArea():
             os.makedirs(output_dir, 0755)
 
         if not os.path.exists(model_dir):
-            logger.error('Model directory does not exist: ' + model_dir)
+            logger.error('Model directory does not exist: '.format(model_dir))
             return ERROR
 
         # save the current working directory for return to upon error or when
@@ -394,7 +396,7 @@ class BurnedArea():
 
         # information about what we are doing
         logger.info('Processing burned area products for'
-                    '    path/row: {0}, {1}    years: {2} - {3}'
+                    '\n    path/row: {0}, {1}\n    years: {2} - {3}'
                     .format(path, row, start_year, end_year))
 
         # run the seasonal summaries and annual maximums for this stack
@@ -455,7 +457,7 @@ class BurnedArea():
                 continue
 
             # add this file to the queue to be processed
-            logger.info('Pushing on the queue ... ' + xml_file)
+            logger.info('Pushing on the queue ... '.format(xml_file))
             work_queue.put(xml_file)
             num_boosted_scenes += 1
 
@@ -464,9 +466,9 @@ class BurnedArea():
 
         # spawn workers to process each scene in the stack - run the boosted
         # regression model on each scene in the stack
-        logger.info('Spawning {0} scenes for boosted regression via {1} '
-                    'processors ....'.format(num_boosted_scenes,
-                                             num_processors))
+        logger.info('Spawning {0} scenes for boosted regression via {1}'
+                    ' processors ....'
+                    .format(num_boosted_scenes, num_processors))
         for i in range(num_processors):
             worker = parallelSceneRegressionWorker(work_queue, result_queue,
                 self)
@@ -503,13 +505,13 @@ class BurnedArea():
 
         # zip the burn area annual summaries
         zip_file = 'burned_area_%03d_%03d.zip' % (path, row)
-        logger.info('\nZipping the annual summaries to ' + zip_file)
+        logger.info('\nZipping the annual summaries to '.format(zip_file))
         cmdstr = 'zip %s burned_area_* burn_count_* good_looks_count_* '  \
             'max_burn_prob_*' % zip_file
         os.system(cmdstr)
         if not os.path.exists(zip_file):
             logger.info('Error creating the zip file of all the annual burn '
-                        'summaries: ' + zip_file)
+                        'summaries: '.format(zip_file))
             os.chdir (mydir)
             return ERROR
 

@@ -150,8 +150,8 @@ class BoostedRegressionConfig():
 
         # make sure the mask file exists
         if not os.path.exists(input_mask_file):
-            logger.info('input mask file does not exist or is not '
-                        'accessible: {0}'.format(input_mask_file))
+            logger.error('input mask file does not exist or is not '
+                         'accessible: {0}'.format(input_mask_file))
             return ERROR
 
         # make sure the model file exists

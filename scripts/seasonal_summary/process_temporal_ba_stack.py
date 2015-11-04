@@ -291,8 +291,7 @@ class temporalBAStack():
 
                     # move the scene files to the exclude subdirectory
                     all_files = self.input_dir + scene_name + '*'
-                    logger.info('Moving {0} to {1}'.format(all_files,
-                                                           rmse_dir))
+                    logger.info('Moving {0} to {1}'.format(all_files, rmse_dir))
                     for data in glob.glob(self.input_dir + scene_name + '*'):
                         shutil.move (data, rmse_dir)
 
@@ -380,7 +379,7 @@ class temporalBAStack():
         # open the output files
         flist_out = open(list_file, 'w')
         if not flist_out:
-            logger.error('Could not open list_file: ' + flist_out)
+            logger.error('Could not open list_file: '.format(flist_out))
             return ERROR
 
         # loop through *.xml files in input_directory and gather info
@@ -767,12 +766,12 @@ class temporalBAStack():
 
         # create a queue to pass to workers to store the processing status
         result_queue = multiprocessing.Queue()
- 
+
         # spawn workers to process each year in the stack - generate the
         # seasonal summaries
         logger.info('Spawning {0} years for processing seasonal summaries via'
-                    ' {1} processors ....'.format(num_years,
-                                                  self.num_processors))
+                    ' {1} processors ....'
+                    .format(num_years, self.num_processors))
         for i in range(self.num_processors):
             worker = parallelSummaryWorker(work_queue, result_queue, self)
             worker.start()
@@ -783,8 +782,8 @@ class temporalBAStack():
                 status = result_queue.get()
                 if status != SUCCESS:
                     logger.error('Error processing seasonal summaries for year'
-                                 ' {0} and season {1}'.format(start_year + i,
-                                                              season))
+                                 ' {0} and season {1}'
+                                 .format(start_year + i, season))
                     return ERROR
 
         endTime = time.time()
@@ -894,8 +893,8 @@ class temporalBAStack():
         # line/sample; if there aren't any files for this year and
         # season then just fill with zeros; write data as a byte
         # since there won't be enough total files to go past 256
-        logger.info('    Generating {0} %s good looks using {1} '
-                    'files ...'.format(year, season, n_files))
+        logger.info('    Generating {0} {1} good looks using {2}'
+                    ' files ...'.format(year, season, n_files))
         if n_files > 0:
             good_looks = apply_over_axes(sum, mask_data_good,  \
                 axes=[0])[0,:,:]
@@ -1075,6 +1074,7 @@ class temporalBAStack():
           1. The seasons will be ignored.
         """
         logger = logging.getLogger(__name__)  # Obtain logger for this module.
+
         # make sure the stack file exists
         if not os.path.exists(stack_file):
             logger.error('Could not open stack file: ' + stack_file)

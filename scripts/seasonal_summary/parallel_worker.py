@@ -118,8 +118,8 @@ class parallelMaxWorker(multiprocessing.Process):
             status = SUCCESS
             status = self.stackObject.generateYearMaximums (year)
             if status != SUCCESS:
-                logger.info('Error processing maximums for year {0}.'
-                            ' Processing will terminate.'.format(year))
+                logger.error('Error processing maximums for year {0}.'
+                             ' Processing will terminate.'.format(year))
  
             # store the result
             self.result_queue.put(status)
