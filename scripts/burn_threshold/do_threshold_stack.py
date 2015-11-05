@@ -302,11 +302,11 @@ class BurnAreaThreshold():
                     local_threshold=flood_fill_prob_thresh, nodata=-9999)
 
                 if False:
-                    logger.debug('''{0}
-Seed region label:{1}
-Number of pixels in region:{2}
-First coordinate:{3}
-Filled pixels:{4}'''.format('#' * 60, temp_label, temp_area,
+                    logger.debug('''################################################################################
+Seed region label:{0}
+Number of pixels in region:{1}
+First coordinate:{2}
+Filled pixels:{3}'''.format(temp_label, temp_area,
                             temp_coords, nFilled))
 
 
@@ -678,7 +678,7 @@ Filled pixels:{4}'''.format('#' * 60, temp_label, temp_area,
             bp_file_name = xml_file.replace('.xml','_burn_probability.img')
             if not os.path.exists(bp_file_name):
                 msg = 'burn probability file does not exist: ' +  bp_file_name
-                logger.info(msg)
+                logger.error(msg)
                 os.chdir (mydir)
                 return ERROR
 
@@ -705,7 +705,7 @@ Filled pixels:{4}'''.format('#' * 60, temp_label, temp_area,
             if status != SUCCESS:
                 msg = 'Error in burn threshold for %d file in the list '  \
                     '(associated XML file is %s).' % (i, stack2['file_'][i])
-                logger.info(msg)
+                logger.error(msg)
                 return ERROR
 
         # successful completion.  return to the original directory.

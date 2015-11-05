@@ -113,7 +113,7 @@ class XML_Scene:
         self.band_dict['band_adjacent_cloud'] = xml_file.replace ('.xml', \
             '_sr_adjacent_cloud_qa.img')
         logger.debug(self.band_dict)
- 
+
         # open connections to the individual bands
         self.dataset1 = gdal.Open(self.band_dict['band1'])
         if self.dataset1 is None:

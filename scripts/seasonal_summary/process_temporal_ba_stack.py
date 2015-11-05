@@ -999,7 +999,7 @@ class temporalBAStack():
 
             # loop through each line in the image and process
             for y in range (0, self.nrow):
-#                logger.debug('Line: {0}'.format(y))
+#                logger.info('Line: {0}'.format(y))
                 # loop through the current set of files and process them
                 for i in range(0, n_files):
 #                    logger.debug('  Stacking file: ' + files[i])
@@ -1273,7 +1273,7 @@ class temporalBAStack():
 #                logger.info('Line: {0}'.format(y))
                 # loop through the current set of files and process them
                 for i in range(0, n_files):
-#                    logger.info('  Stacking file: ' + files[i])
+#                    logger.debug('  Stacking file: ' + files[i])
                     # read the current row of data
                     my_indx_band = indx_band[i]
                     indx_data[i,:] = my_indx_band.ReadAsArray(0, y,  \
