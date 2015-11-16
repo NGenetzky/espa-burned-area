@@ -543,8 +543,8 @@ def setup_root_logger(logfile, file_loglevel=logging.INFO,
         All messages that are higher than "console_loglevel" will be written
             to the console.
         If "logfile" exists:
-            Contents of "logfile" will be erased/overwritten with new messages.
-        else if logfile does not exist:
+            Contents of "logfile" will be erased/overwritten with new messages
+        else if "logfile" does not exist:
             "logfile" will be created.
     '''
     format = ('%(asctime)s.%(msecs)03d %(process)d'
@@ -563,7 +563,7 @@ def setup_root_logger(logfile, file_loglevel=logging.INFO,
     fh.setFormatter(logging.Formatter(fmt=format, datefmt=datefmt))
 
     # create console handler to send log messages to the console.
-    ch = logging.StreamHandler()
+    ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(console_loglevel)
     ch.setFormatter(logging.Formatter(fmt=format, datefmt=datefmt))
 
