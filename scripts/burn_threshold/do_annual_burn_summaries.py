@@ -647,8 +647,8 @@ class AnnualBurnSummary():
         nodata = bp_band.GetNoDataValue()
         if nodata is None:
             nodata = -9999
-            logger.error('Failed to obtain the NoDataValue from {0}.'
-                         '  Using {1}'.format(bp_file, nodata))
+            logger.warn('Failed to obtain the NoDataValue from {0}.'
+                        '  Using {1}'.format(bp_file, nodata))
 
         # close the file
         bp_band = None
@@ -821,7 +821,7 @@ class AnnualBurnSummary():
         # won't be delivered to the user
         rm_files = glob.glob (output_dir + '/burned_area_*.img.aux.xml')
         for file in rm_files:
-            logger.info('Remove: ' + file))
+            logger.info('Remove: ' + file)
             os.remove (os.path.join (file))
 
         rm_files = glob.glob (output_dir + '/burn_count_*.img.aux.xml')

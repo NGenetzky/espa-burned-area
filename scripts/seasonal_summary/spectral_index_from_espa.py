@@ -208,7 +208,7 @@ class spectralIndex:
         """
         logger = logging.getLogger(__name__)  # Obtain logger for this module.
         num_indices = len(index_dict)
-        logger.info('    Processing %d indices: '.format(num_indices))
+        logger.info('    Processing {0} indices: '.format(num_indices))
         for index in index_dict.keys():
             logger.info('      ' + index)
 
