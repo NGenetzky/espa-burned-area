@@ -124,8 +124,8 @@ class BurnedArea():
                 # recheck just in case there is another thread that made the
                 # config directory already
                 if not os.path.exists(config_dir):
-                    logger.error('Unable to create config directory:'
-                                 ' Exiting ...{0}. '.format(config_dir))
+                    logger.error('Unable to create config directory: {0}.'
+                                 ' Exiting ...'.format(config_dir))
                     return ERROR
 
         temp_file = tempfile.NamedTemporaryFile(mode='w', prefix='temp',
@@ -264,7 +264,7 @@ class BurnedArea():
                      'extents. The MTL and XML file will remain for downstream '
                      'processing.')
             parser.add_argument('-l', '--logfile', type=str, dest='logfile',
-                                metavar='FILE', default='burned_area.log',
+                                metavar='FILE', default=None,
                                 help='name of optional log file')
             options = parser.parse_args()
 
@@ -310,7 +310,8 @@ class BurnedArea():
             return ERROR
 
         if not os.path.exists(input_dir):
-            logger.error('Input directory does not exist: '.format(input_dir))
+            logger.error('Input directory does not exist: {0}'
+                         .format(input_dir))
             return ERROR
 
         if not os.path.exists(output_dir):
@@ -319,7 +320,8 @@ class BurnedArea():
             os.makedirs(output_dir, 0755)
 
         if not os.path.exists(model_dir):
-            logger.error('Model directory does not exist: '.format(model_dir))
+            logger.error('Model directory does not exist: {0}'
+                         .format(model_dir))
             return ERROR
 
         # save the current working directory for return to upon error or when
@@ -457,7 +459,7 @@ class BurnedArea():
                 continue
 
             # add this file to the queue to be processed
-            logger.info('Pushing on the queue ... '.format(xml_file))
+            logger.info('Pushing on the queue ... {0}'.format(xml_file))
             work_queue.put(xml_file)
             num_boosted_scenes += 1
 
@@ -505,13 +507,13 @@ class BurnedArea():
 
         # zip the burn area annual summaries
         zip_file = 'burned_area_%03d_%03d.zip' % (path, row)
-        logger.info('\nZipping the annual summaries to '.format(zip_file))
+        logger.info('\nZipping the annual summaries to {0}'.format(zip_file))
         cmdstr = 'zip %s burned_area_* burn_count_* good_looks_count_* '  \
             'max_burn_prob_*' % zip_file
         os.system(cmdstr)
         if not os.path.exists(zip_file):
             logger.info('Error creating the zip file of all the annual burn '
-                        'summaries: '.format(zip_file))
+                        'summaries: {0}'.format(zip_file))
             os.chdir (mydir)
             return ERROR
 
@@ -525,7 +527,7 @@ class BurnedArea():
 
 ######end of BurnedArea class######
 
-def setup_root_logger(logfile, file_loglevel=logging.INFO,
+def setup_root_logger(logfile=None, file_loglevel=logging.INFO,
                       console_loglevel=logging.INFO):
     '''Setup settings that are inherited by all logger modules
 
@@ -556,19 +558,19 @@ def setup_root_logger(logfile, file_loglevel=logging.INFO,
     root = logging.getLogger()  # Obtain "super class"/root logger
     root.setLevel(logging.NOTSET)  # NOTSET means all messages are proccessed.
 
-    # Create file handler to send log messages to.
-    # 'w', contents will be overwritten.'+', will create if not exist.
-    fh = logging.FileHandler(logfile, 'w+')
-    fh.setLevel(file_loglevel)
-    fh.setFormatter(logging.Formatter(fmt=format, datefmt=datefmt))
+    if logfile is not None:
+        # Create file handler to send log messages to.
+        # 'w', contents will be overwritten.'+', will create if not exist.
+        fh = logging.FileHandler(logfile, 'w+')
+        fh.setLevel(file_loglevel)
+        fh.setFormatter(logging.Formatter(fmt=format, datefmt=datefmt))
+        root.addHandler(fh)  # add the handlers to root logger
 
     # create console handler to send log messages to the console.
     ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(console_loglevel)
     ch.setFormatter(logging.Formatter(fmt=format, datefmt=datefmt))
-
     root.addHandler(ch)  # add the handlers to root logger
-    root.addHandler(fh)  # add the handlers to root logger
 
 
 if __name__ == "__main__":

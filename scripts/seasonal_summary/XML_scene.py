@@ -633,6 +633,9 @@ class XML_Scene:
               Geographic Science Center
           Updated on 3/18/2014 by Gail Schmidt, USGS/EROS LSRD Project
               Modified to work with the ESPA internal file format.
+
+        Inputs:  N/A
+
         Returns:  N/A
         """
         # create the name of the QA file from the XML filename

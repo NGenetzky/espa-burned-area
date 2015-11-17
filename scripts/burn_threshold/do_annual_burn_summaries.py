@@ -665,8 +665,8 @@ class AnnualBurnSummary():
         #    4. maximum probability for burned area (max_burn_prob)
     
         # loop through the years in the stack
-        logger.info('Processing burn files for {0}-{1}'.format(start_year,
-                                                               end_year))
+        logger.info('Processing burn files for {0}-{1}'
+                    .format(start_year, end_year))
         for year in range(start_year, end_year+1):
             logger.info('########################################################')
             logger.info('Processing {0} ...'.format(year))

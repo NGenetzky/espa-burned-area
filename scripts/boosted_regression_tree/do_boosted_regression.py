@@ -102,7 +102,7 @@ class BoostedRegression():
         # make sure the configuration file exists
         if not os.path.isfile(config_file):
             logger.error('configuration file does not exist or is not'
-                        ' accessible: {0}'.format(config_file))
+                         ' accessible: {0}'.format(config_file))
             return ERROR
 
         # get the path of the config file and change directory to that location
@@ -134,7 +134,7 @@ class BoostedRegression():
             logger.info(output)
         except subprocess.CalledProcessError, e:
             logger.error('Error running boosted regression. Processing will '
-                         'terminate.\n ' + e.output)
+                         'terminate.' + e.output)
             os.chdir (mydir)
             return ERROR
 

@@ -217,7 +217,7 @@ class BurnAreaThreshold():
         
         
     def findBurnScars(self, bp_image, seed_prob_thresh=97.5,
-        seed_size_thresh=5, flood_fill_prob_thresh=75):
+                      seed_size_thresh=5, flood_fill_prob_thresh=75):
         """Identify the seeds for burn scars from the input burn probabilities.
         Description: routine to find burn scars using the flood-fill approach.
           Seed pixels are found by using the seed threshold.  Any pixels with

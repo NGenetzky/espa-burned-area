@@ -379,7 +379,7 @@ class temporalBAStack():
         # open the output files
         flist_out = open(list_file, 'w')
         if not flist_out:
-            logger.error('Could not open list_file: '.format(flist_out))
+            logger.error('Could not open list_file: {0}'.format(flist_out))
             return ERROR
 
         # loop through *.xml files in input_directory and gather info
@@ -760,8 +760,8 @@ class temporalBAStack():
 
         for year in range (start_year, end_year+1):
             for season in ['winter', 'spring', 'summer', 'fall']:
-                logger.info('Pushing {0}, {1} to the queue'.format(year,
-                                                                   season))
+                logger.info('Pushing {0}, {1} to the queue'
+                            .format(year, season))
                 work_queue.put([year, season])
 
         # create a queue to pass to workers to store the processing status
@@ -860,8 +860,8 @@ class temporalBAStack():
         # if there aren't any files to process then write out a
         # product with fill
         n_files = sum (season_files)
-        logger.info('  season = {0},  file count = {1}'.format(season,
-                                                               n_files))
+        logger.info('  season = {0},  file count = {1}'
+                    .format(season, n_files))
  
         # pull the files for this year and season
         files = self.csv_data['file_'][season_files]
@@ -999,7 +999,7 @@ class temporalBAStack():
 
             # loop through each line in the image and process
             for y in range (0, self.nrow):
-#                logger.info('Line: {0}'.format(y))
+#                logger.debug('Line: {0}'.format(y))
                 # loop through the current set of files and process them
                 for i in range(0, n_files):
 #                    logger.debug('  Stacking file: ' + files[i])
@@ -1096,8 +1096,8 @@ class temporalBAStack():
         years = unique (self.csv_data['year'])
         start_year = years[0]
         end_year = years[len(years)-1]
-        logger.info('\nProcessing stack for {0} - {1}'.format(start_year,
-                                                              end_year))
+        logger.info('\nProcessing stack for {0} - {1}'
+                    .format(start_year, end_year))
 
         # determine band1 file for the first scene listed in the stack
         first_file = self.csv_data['file_'][0]
@@ -1131,8 +1131,8 @@ class temporalBAStack():
         # spawn workers to process each year in the stack - generate the
         # seasonal summaries
         logger.info('Spawning {0} years for processing annual maximums via'
-                    ' {1} processors ....'.format(num_years,
-                                                  self.num_processors))
+                    ' {1} processors ....'
+                    .format(num_years, self.num_processors))
         for i in range(self.num_processors):
             worker = parallelMaxWorker(work_queue, result_queue, self)
             worker.start()
@@ -1270,7 +1270,7 @@ class temporalBAStack():
 
             # loop through each line in the image and process
             for y in range (0, self.nrow):
-#                logger.info('Line: {0}'.format(y))
+#                logger.debug('Line: {0}'.format(y))
                 # loop through the current set of files and process them
                 for i in range(0, n_files):
 #                    logger.debug('  Stacking file: ' + files[i])
@@ -1375,7 +1375,7 @@ class temporalBAStack():
         # if no parameters were passed then get the info from the
         # command line
         logger.info('Start time:' +
-                    str(datetime.datetime.now().strftime("%b %d %Y %H:%M:%S")))
+                    str(datetime.datetime.now().strftime('%b %d %Y %H:%M:%S')))
         startTime0 = time.time()
         if input_dir is None:
             # get the command line argument for the input parameters
@@ -1428,7 +1428,7 @@ class temporalBAStack():
             # input directory
             input_dir = options.input_dir
             if input_dir is None:
-                parser.error('missing input directory command-line argument')
+                logger.error('missing input directory command-line argument')
                 return ERROR
 
             # number of processors
@@ -1498,7 +1498,7 @@ class temporalBAStack():
             logger.info(output)
         except subprocess.CalledProcessError, e:
             logger.error('Error running generate_stack. Processing will '
-                         'terminate.\n ' + e.output)
+                         'terminate.' + e.output)
             os.chdir (mydir)
             return ERROR
 
@@ -1513,7 +1513,7 @@ class temporalBAStack():
             logger.info(output)
         except subprocess.CalledProcessError, e:
             logger.error('Error running determine_max_extent. Processing will '
-                         'terminate.\n ' + e.output)
+                         'terminate.' + e.output)
             os.chdir (mydir)
             return ERROR
 
