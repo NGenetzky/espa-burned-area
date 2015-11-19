@@ -134,7 +134,7 @@ class BoostedRegression():
             logger.info(output)
         except subprocess.CalledProcessError, e:
             logger.error('Error running boosted regression. Processing will '
-                         'terminate.' + e.output)
+                         'terminate.{0}'.format(e.output))
             os.chdir (mydir)
             return ERROR
 

@@ -89,7 +89,7 @@ class XML_Scene:
         # make sure the file exists then open it with GDAL
         self.xml_file = xml_file               # store the filename
         if not os.path.exists (xml_file):
-            logger.error('Input XML file does not exist: ' + xml_file)
+            logger.error('Input XML file does not exist: {0}'.format(xml_file))
             return None
 
         # parse the XML file looking for the surface reflectance bands 1-7
@@ -117,76 +117,76 @@ class XML_Scene:
         # open connections to the individual bands
         self.dataset1 = gdal.Open(self.band_dict['band1'])
         if self.dataset1 is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band1'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band1']))
             return None
 
         self.dataset2 = gdal.Open(self.band_dict['band2'])
         if self.dataset2 is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band2'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band2']))
             return None
 
         self.dataset3 = gdal.Open(self.band_dict['band3'])
         if self.dataset3 is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band3'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band3']))
             return None
 
         self.dataset4 = gdal.Open(self.band_dict['band4'])
         if self.dataset4 is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band4'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band4']))
             return None
 
         self.dataset5 = gdal.Open(self.band_dict['band5'])
         if self.dataset5 is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band5'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band5']))
             return None
 
         self.dataset7 = gdal.Open(self.band_dict['band7'])
         if self.dataset7 is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band7'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band7']))
             return None
 
         self.dataset_fill_QA = gdal.Open(self.band_dict['band_fill'])
         if self.dataset_fill_QA is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band_fill'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band_fill']))
             return None
 
         self.dataset_cloud_QA = gdal.Open(self.band_dict['band_cloud'])
         if self.dataset_cloud_QA is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band_cloud'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band_cloud']))
             return None
 
         self.dataset_shadow_QA = gdal.Open(self.band_dict['band_cloud_shadow'])
         if self.dataset_shadow_QA is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band_cloud_shadow'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band_cloud_shadow']))
             return None
 
         self.dataset_snow_QA = gdal.Open(self.band_dict['band_snow'])
         if self.dataset_snow_QA is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band_snow'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band_snow']))
             return None
 
         self.dataset_land_water_QA =  \
             gdal.Open(self.band_dict['band_land_water'])
         if self.dataset_land_water_QA is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band_land_water'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band_land_water']))
             return None
 
         self.dataset_adjacent_cloud_QA =  \
             gdal.Open(self.band_dict['band_adjacent_cloud'])
         if self.dataset_adjacent_cloud_QA is None:
-            logger.error('GDAL could not open input file: ' +
-                         self.band_dict['band_adjacent_cloud'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(self.band_dict['band_adjacent_cloud']))
 
         # create connections to the bands
         self.band1 = self.dataset1.GetRasterBand(1)

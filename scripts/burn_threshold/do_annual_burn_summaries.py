@@ -555,17 +555,17 @@ class AnnualBurnSummary():
                 return ERROR
 
         if not os.path.exists(stack_file):
-            logger.error('CSV stack file does not exist: ' + stack_file)
+            logger.error('CSV stack file does not exist: {0}'.format(stack_file))
             return ERROR
 
         if not os.path.exists(bp_dir):
-            logger.error('Burn probability directory does not exist: ' +
-                         bp_dir)
+            logger.error('Burn probability directory does not exist: {0}'
+                         .format(bp_dir))
             return ERROR
 
         if not os.path.exists(bc_dir):
-            logger.error('Burn classificaton directory does not exist: ' +
-                         bc_dir)
+            logger.error('Burn classificaton directory does not exist: {0}'
+                         .format(bc_dir))
             return ERROR
 
         if not os.path.exists(output_dir):
@@ -576,8 +576,8 @@ class AnnualBurnSummary():
         # save the current working directory for return to upon error or when
         # processing is complete
         mydir = os.getcwd()
-        logger.info('Changing directories for burn threshold processing: ' +
-                    output_dir)
+        logger.info('Changing directories for burn threshold processing: {0}'
+                    .format(output_dir))
         os.chdir (output_dir)
 
         # start of threshold processing
@@ -609,39 +609,39 @@ class AnnualBurnSummary():
             ('.xml','_burn_probability.img')
         bp_file = bp_dir + '/' + fname
         if not os.path.exists(bp_file):
-            logger.error('burn probability file does not exist: ' + bp_file)
+            logger.error('burn probability file does not exist: {0}'.format(bp_file))
             os.chdir (mydir)
             return ERROR
 
         bp_dataset = gdal.Open(bp_file)
         if bp_dataset is None:
-            logger.error('Failed to open bp file: ' + bp_file)
+            logger.error('Failed to open bp file: {0}'.format(bp_file))
             os.chdir (mydir)
             return ERROR
         
         bp_band = bp_dataset.GetRasterBand(1)
         if bp_band is None:
-            logger.error('Failed to open bp band 1 from ' + bp_file)
+            logger.error('Failed to open bp band 1 from {0}'.format(bp_file))
             os.chdir (mydir)
             return ERROR
         
         geotrans = bp_dataset.GetGeoTransform()
         if geotrans is None:
-            logger.error('Failed to obtain the GeoTransform info from ' +
-                         bp_file)
+            logger.error('Failed to obtain the GeoTransform info from {0}'
+                         .format(bp_file))
             return ERROR
 
         prj = bp_dataset.GetProjectionRef()
         if prj is None:
-            logger.error('Failed to obtain the ProjectionRef info from ' +
-                         bp_file)
+            logger.error('Failed to obtain the ProjectionRef info from {0}'
+                         .format(bp_file))
             return ERROR
 
         nrow = bp_dataset.RasterYSize
         ncol = bp_dataset.RasterXSize
         if (nrow is None) or (ncol is None):
             logger.error('Failed to obtain the RasterXSize and RasterYSize'
-                         ' from ' + bp_file)
+                         ' from {0}'.format(bp_file))
             return ERROR
 
         nodata = bp_band.GetNoDataValue()
@@ -692,8 +692,8 @@ class AnnualBurnSummary():
                     ('.xml','_burn_probability.img')
                 bp_file = bp_dir + '/' + fname
                 if not os.path.exists(bp_file):
-                    logger.error('burn probability file does not exist: ' +
-                                 bp_file)
+                    logger.error('burn probability file does not exist: {0}'
+                                 .format(bp_file))
                     os.chdir (mydir)
                     return ERROR
 
@@ -705,8 +705,8 @@ class AnnualBurnSummary():
                     ('.xml','_burn_class.img')
                 bc_name = bc_dir + '/' + fname
                 if not os.path.exists(bc_name):
-                    logger.error('burn classification file does not exist: ' +
-                                 bc_name)
+                    logger.error('burn classification file does not exist: {0}'
+                                 .format(bc_name))
                     os.chdir (mydir)
                     return ERROR
 
@@ -821,22 +821,22 @@ class AnnualBurnSummary():
         # won't be delivered to the user
         rm_files = glob.glob (output_dir + '/burned_area_*.img.aux.xml')
         for file in rm_files:
-            logger.info('Remove: ' + file)
+            logger.info('Remove: {0}'.format(file))
             os.remove (os.path.join (file))
 
         rm_files = glob.glob (output_dir + '/burn_count_*.img.aux.xml')
         for file in rm_files:
-            logger.info('Remove: ' + file)
+            logger.info('Remove: {0}'.format(file))
             os.remove (os.path.join (file))
 
         rm_files = glob.glob (output_dir + '/good_looks_count_*.img.aux.xml')
         for file in rm_files:
-            logger.info('Remove: ' + file)
+            logger.info('Remove: {0}'.format(file))
             os.remove (os.path.join (file))
 
         rm_files = glob.glob (output_dir + '/max_burn_prob_*.img.aux.xml')
         for file in rm_files:
-            logger.info('Remove: ' + file)
+            logger.info('Remove: {0}'.format(file))
             os.remove (os.path.join (file))
 
         # create the output XML file which contains information for each of
@@ -850,8 +850,8 @@ class AnnualBurnSummary():
         status = self.createXML (xml_file, output_xml_file, start_year,
             end_year, nodata, fname)
         if status != SUCCESS:
-            logger.error('Failed to write the output XML file: ' +
-                         output_xml_file)
+            logger.error('Failed to write the output XML file: {0}'
+                         .format(output_xml_file))
             return ERROR
 
         # successful completion.  return to the original directory.

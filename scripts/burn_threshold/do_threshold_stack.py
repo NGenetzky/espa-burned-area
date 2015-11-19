@@ -683,7 +683,7 @@ Filled pixels:{3}'''.format(temp_label, temp_area,
                 return ERROR
 
             # add this file to the queue to be processed
-            logger.info('Pushing on the queue ... ' + bp_file_name)
+            logger.info('Pushing on the queue ... {0}'.format(bp_file_name))
             work_queue.put(bp_file_name)
 
         # create a queue to pass to workers to store the processing status

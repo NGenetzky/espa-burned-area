@@ -76,44 +76,44 @@ class spectralIndex:
         # open connections to the individual bands
         self.dataset1 = gdal.Open(band_dict['band1'])
         if self.dataset1 is None:
-            logger.error('GDAL could not open input file: ' +
-                         band_dict['band1'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(band_dict['band1']))
             return None
 
         self.dataset2 = gdal.Open(band_dict['band2'])
         if self.dataset2 is None:
-            logger.error('GDAL could not open input file: ' +
-                         band_dict['band2'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(band_dict['band2']))
             return None
 
         self.dataset3 = gdal.Open(band_dict['band3'])
         if self.dataset3 is None:
-            logger.error('GDAL could not open input file: ' +
-                         band_dict['band3'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(band_dict['band3']))
             return None
 
         self.dataset4 = gdal.Open(band_dict['band4'])
         if self.dataset4 is None:
-            logger.error('GDAL could not open input file: ' +
-                         band_dict['band4'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(band_dict['band4']))
             return None
 
         self.dataset5 = gdal.Open(band_dict['band5'])
         if self.dataset5 is None:
-            logger.error('GDAL could not open input file: ' +
-                         band_dict['band5'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(band_dict['band5']))
             return None
 
         self.dataset7 = gdal.Open(band_dict['band7'])
         if self.dataset7 is None:
-            logger.error('GDAL could not open input file: ' +
-                         band_dict['band7'])
+            logger.error('GDAL could not open input file: {0}'
+                         .format(band_dict['band7']))
             return None
 
         self.dataset_mask = gdal.Open(band_dict['band_qa'])
         if self.dataset_mask is None:
-            logger.error('GDAL could not open input mask file: ' +
-                         band_dict['band_qa'])
+            logger.error('GDAL could not open input mask file: {0}'
+                         .format(band_dict['band_qa']))
             return None
 
         # create connections to the bands
@@ -234,7 +234,7 @@ class spectralIndex:
             # create the output folder if it does not exist
             output_dir = os.path.dirname(index_dict[index])
             if not os.path.exists(output_dir):
-                logger.info('Creating output directory ' + output_dir)
+                logger.info('Creating output directory {0}'.format(output_dir))
                 os.makedirs(output_dir)
 
             # create the output file; spectral indices are multiplied by 1000.0

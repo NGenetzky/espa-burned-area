@@ -59,14 +59,14 @@ class ENVI_Scene:
 
         # make sure the file exists
         if not os.path.exists(fname):
-            logger.error('Input file does not exist: ' + fname)
+            logger.error('Input file does not exist: {0}'.format(fname))
             return None
 
         # store the filename for this class and open it
         self.filename = fname
         self.dataset = gdal.Open (fname)
         if self.dataset is None:
-            logger.error('GDAL could not open input file: ' + fname)
+            logger.error('GDAL could not open input file: {0}'.format(fname))
             return None
 
         # create connections to the band
