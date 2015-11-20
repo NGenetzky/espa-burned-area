@@ -555,7 +555,8 @@ class AnnualBurnSummary():
                 return ERROR
 
         if not os.path.exists(stack_file):
-            logger.error('CSV stack file does not exist: {0}'.format(stack_file))
+            logger.error('CSV stack file does not exist: {0}'
+                         .format(stack_file))
             return ERROR
 
         if not os.path.exists(bp_dir):
@@ -609,7 +610,8 @@ class AnnualBurnSummary():
             ('.xml','_burn_probability.img')
         bp_file = bp_dir + '/' + fname
         if not os.path.exists(bp_file):
-            logger.error('burn probability file does not exist: {0}'.format(bp_file))
+            logger.error('burn probability file does not exist: {0}'
+                         .format(bp_file))
             os.chdir (mydir)
             return ERROR
 

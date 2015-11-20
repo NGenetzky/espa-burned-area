@@ -373,7 +373,8 @@ class temporalBAStack():
         # if needed
         list_dirname = os.path.dirname(list_file)
         if list_dirname != "" and not os.path.exists (list_dirname):
-            logger.info('Creating directory for output file: {0}'.format(list_dirname))
+            logger.info('Creating directory for output file: {0}'
+                        .format(list_dirname))
             os.makedirs (list_dirname)
 
         # open the output files
@@ -722,7 +723,8 @@ class temporalBAStack():
         startTime = time.time()
         self.csv_data = recfromcsv (stack_file, delimiter=',', names=True)
         if self.csv_data is None:
-            logger.error('Error reading the stack file: {0}'.format(stack_file))
+            logger.error('Error reading the stack file: {0}'
+                         .format(stack_file))
             return ERROR
 
         # get the sorted, unique years in the stack; grab the first and last
@@ -877,7 +879,8 @@ class temporalBAStack():
             mask_file = '%s%s' % (self.mask_dir, base_file)
             mask_dataset = gdal.Open (mask_file, gdalconst.GA_ReadOnly)
             if mask_dataset is None:
-                logger.error('Could not open mask file: {0}'.format(mask_file))
+                logger.error('Could not open mask file: {0}'
+                             .format(mask_file))
                 return ERROR
             mask_band = mask_dataset.GetRasterBand(1)
             mask_data[i,:,:] = mask_band.ReadAsArray()
@@ -915,7 +918,8 @@ class temporalBAStack():
         good_looks_dataset = gdal.Open (good_looks_file,  \
             gdalconst.GA_Update)
         if good_looks_dataset is None:
-            logger.error('Could not create output file: {0}'.format(good_looks_file))
+            logger.error('Could not create output file: {0}'
+                         .format(good_looks_file))
             return ERROR
         
         good_looks_dataset.SetGeoTransform(self.geotrans)
@@ -965,7 +969,8 @@ class temporalBAStack():
                 gdalconst.GDT_Int16)
             temp_out_dataset = gdal.Open (temp_file, gdalconst.GA_Update)
             if temp_out_dataset is None:
-                logger.info('Could not create output file: {0}'.format(temp_file))
+                logger.info('Could not create output file: {0}'
+                            .format(temp_file))
                 return ERROR
     
             temp_out_dataset.SetGeoTransform(self.geotrans)
@@ -993,7 +998,8 @@ class temporalBAStack():
                 # open the appropriate band in the input image
                 my_temp_band = my_ds.GetRasterBand(1)
                 if my_temp_band is None:
-                    logger.error('Could not open raster band for {0}'.format(ind))
+                    logger.error('Could not open raster band for {0}'
+                                 .format(ind))
                     return ERROR
                 temp_band[i] = my_temp_band
 
@@ -1077,7 +1083,8 @@ class temporalBAStack():
 
         # make sure the stack file exists
         if not os.path.exists(stack_file):
-            logger.error('Could not open stack file: {0}'.format(stack_file))
+            logger.error('Could not open stack file: {0}'
+                         .format(stack_file))
             return ERROR
 
         # ignore divide by zero and invalid (NaN) values when doing array
@@ -1088,7 +1095,8 @@ class temporalBAStack():
         startTime = time.time()
         self.csv_data = recfromcsv (stack_file, delimiter=',', names=True)
         if self.csv_data is None:
-            logger.error('Error reading the stack file: {0}'.format(stack_file))
+            logger.error('Error reading the stack file: {0}'
+                         .format(stack_file))
             return ERROR
 
         # get the sorted, unique years in the stack; grab the first and last
@@ -1109,7 +1117,8 @@ class temporalBAStack():
         # and other associated info for the stack of scenes
         enviMask = ENVI_Scene (first_file)
         if enviMask is None:
-             logger.error('Error reading the ENVI file: {0}'.format(first_file))
+             logger.error('Error reading the ENVI file: {0}'
+                          .format(first_file))
              return ERROR
 
         self.ncol = enviMask.NCol
@@ -1236,7 +1245,8 @@ class temporalBAStack():
                 gdalconst.GDT_Int16)
             temp_out_dataset = gdal.Open (temp_file, gdalconst.GA_Update)
             if temp_out_dataset is None:
-                logger.error('Could not create output file: {0}'.format(temp_file))
+                logger.error('Could not create output file: {0}'
+                             .format(temp_file))
                 return ERROR
     
             temp_out_dataset.SetGeoTransform(self.geotrans)
@@ -1257,14 +1267,16 @@ class temporalBAStack():
                 temp_file = '%s%s' % (dir_name, base_file)
                 my_ds = gdal.Open (temp_file, gdalconst.GA_ReadOnly)
                 if my_ds is None:
-                    logger.error('Could not open index file: {0}'.format(temp_file))
+                    logger.error('Could not open index file: {0}'
+                                  .format(temp_file))
                     return ERROR
                 input_ds[i] = my_ds
                 
                 # open band 1 of the index product
                 my_indx_band = my_ds.GetRasterBand(1)
                 if my_indx_band is None:
-                    logger.error('Could not open raster band for {0}'.format(ind))
+                    logger.error('Could not open raster band for {0}'
+                                 .format(ind))
                     return ERROR
                 indx_band[i] = my_indx_band
 
@@ -1374,8 +1386,8 @@ class temporalBAStack():
         logger = logging.getLogger(__name__)  # Obtain logger for this module.
         # if no parameters were passed then get the info from the
         # command line
-        logger.info('Start time:{0}'
-                    .format(str(datetime.datetime.now().strftime('%b %d %Y %H:%M:%S'))))
+        logger.info('Start time:{0}'.format(str(datetime.datetime
+                    .now().strftime('%b %d %Y %H:%M:%S'))))
         startTime0 = time.time()
         if input_dir is None:
             # get the command line argument for the input parameters
@@ -1450,7 +1462,8 @@ class temporalBAStack():
         # make sure the input directory exists and is writable
         self.input_dir = input_dir
         if not os.path.exists(input_dir):
-            logger.error('Input directory does not exist: {0}'.format(input_dir))
+            logger.error('Input directory does not exist: {0}'
+                         .format(input_dir))
             return ERROR
 
         if not os.access(input_dir, os.W_OK):
@@ -1575,8 +1588,8 @@ class temporalBAStack():
         logger.info('***Total stack processing time = {0} hours'
                     .format((endTime0 - startTime0) / 3600.0))
 
-        logger.info('End time:{0}'
-                    .format(str(datetime.datetime.now().strftime('%b %d %Y %H:%M:%S'))))
+        logger.info('End time:{0}'.format(str(datetime.datetime
+                    .now().strftime('%b %d %Y %H:%M:%S'))))
         return SUCCESS
 
 ######end of temporalBAStack class######

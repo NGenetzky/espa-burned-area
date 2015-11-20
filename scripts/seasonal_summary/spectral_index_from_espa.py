@@ -234,7 +234,8 @@ class spectralIndex:
             # create the output folder if it does not exist
             output_dir = os.path.dirname(index_dict[index])
             if not os.path.exists(output_dir):
-                logger.info('Creating output directory {0}'.format(output_dir))
+                logger.info('Creating output directory {0}'
+                            .format(output_dir))
                 os.makedirs(output_dir)
 
             # create the output file; spectral indices are multiplied by 1000.0

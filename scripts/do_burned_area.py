@@ -273,7 +273,8 @@ class BurnedArea():
                               file_loglevel=logging.INFO,
                               console_loglevel=logging.INFO)
 
-            logger = logging.getLogger(__name__)  # Obtain logger for this module.
+            # Obtain logger for this module.
+            logger = logging.getLogger(__name__)
 
             # validate command-line options and arguments
             delete_src = options.delete_src

@@ -97,7 +97,8 @@ class BoostedRegression():
         else:
             # don't use a path to the boosted regression application
             bin_dir = ""
-            logger.info('boosted regression executable expected to be in the PATH')
+            logger.info('boosted regression executable expected to be in the'
+                        ' PATH')
 
         # make sure the configuration file exists
         if not os.path.isfile(config_file):
