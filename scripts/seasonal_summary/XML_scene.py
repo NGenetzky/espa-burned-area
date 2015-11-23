@@ -89,7 +89,8 @@ class XML_Scene:
         # make sure the file exists then open it with GDAL
         self.xml_file = xml_file               # store the filename
         if not os.path.exists (xml_file):
-            logger.error('Input XML file does not exist: {0}'.format(xml_file))
+            logger.error('Input XML file does not exist: {0}'
+                         .format(xml_file))
             return None
 
         # parse the XML file looking for the surface reflectance bands 1-7

@@ -745,7 +745,8 @@ class temporalBAStack():
         # and other associated info for the stack of scenes
         enviMask = ENVI_Scene (first_file)
         if enviMask is None:
-            logger.error('Error reading the ENVI file: {0}'.format(first_file))
+            logger.error('Error reading the ENVI file: {0}'
+                         .format(first_file))
             return ERROR
 
         self.ncol = enviMask.NCol
