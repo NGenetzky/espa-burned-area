@@ -1472,7 +1472,7 @@ class temporalBAStack():
                          ' apps need write access to this directory.'
                          .format(input_dir))
             return ERROR
-        logger.info('Changing directories for burned area stack processing: '
+        logger.info('Changing directories for burned area stack processing: {0}'
                     .format(input_dir))
 
         # save the current working directory for return to upon error or when
